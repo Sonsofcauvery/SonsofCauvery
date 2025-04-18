@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Sons of Cauvery</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>Sons of Cauvery</h1>
+            </div>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="page-banner">
+        <div class="banner-content">
+            <h1>Contact Us</h1>
+            <p>Reach out to plan your next fishing adventure</p>
+        </div>
+    </section>
+
+    <section class="contact-section">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h2>Get In Touch</h2>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>Phone</h3>
+                            <p>+91 6360250855</p>
+                           
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>Email</h3>
+                            <p>sonsofcauvery@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h3>Location</h3>
+                            <p>Cauvery Riverside</p>
+                            <p>Srirangapatna, Karnataka, India</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h3>Operating Hours</h3>
+                            <p>Monday to Sunday: 6:00 AM - 6:00 PM</p>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="contact-form">
+                    <h2>Book Your Trip</h2>
+                    <div id="form-success" style="display: none; padding: 20px; background-color: #dff0d8; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+                        <h3 style="color: #3c763d; margin-bottom: 10px;">Your booking request has been submitted!</h3>
+                        <p>WhatsApp will open with your details. Just press send to complete your booking via WhatsApp.</p>
+                    </div>
+                    <form id="booking-form" action="https://formspree.io/f/xdkeroed" method="POST" onsubmit="return sendToWhatsApp(event)">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Preferred Date</label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="guests">Number of Guests</label>
+                            <select id="guests" name="guests" required>
+                                <option value="">Select</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6+">6+</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="experience">Fishing Experience</label>
+                            <select id="experience" name="experience">
+                                <option value="">Select</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="message">Special Requests or Questions</label>
+                            <textarea id="message" name="message" rows="4"></textarea>
+                        </div>
+                        <div class="form-group full-width terms-checkbox">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <label for="terms">I have read and agree to the <a href="terms.html" target="_blank">Terms and Conditions</a></label>
+                        </div>
+                        <input type="hidden" name="_subject" value="New Booking Request - Sons of Cauvery">
+                        <button type="submit" class="btn submit-btn">Submit Booking Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="map-section">
+        <div class="container">
+            <h2>Find Us</h2>
+            <div class="map-container">
+                <!-- This is a placeholder for an actual map. In a real implementation, you'd use Google Maps or another map service. -->
+                <div class="map-placeholder">
+                    <img src="photos-and-videos/Snapshot_71.PNG" alt="Location Map">
+                    <div class="map-info">
+                        <p>Please contact us for precise directions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>Sons of Cauvery</h2>
+                    <p>The ultimate fishing experience</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-phone"></i> +91 6360250855</p>
+                    <p><i class="fas fa-envelope"></i> sonsofcauvery@gmail.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Cauvery Riverside, Srirangapatna, Karnataka, India</p>
+                </div>
+                <div class="footer-social">
+                    <h3>Follow Us</h3>
+                    <div class="social-icons">
+                        <a href="https://www.instagram.com/sonsofcauvery" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.youtube.com/@sonsofcauvery" target="_blank"><i class="fab fa-youtube"></i></a>
+                        <a href="https://wa.me/916360250855" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Sons of Cauvery. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script src="scripts.js"></script>
+    <script>
+        function sendToWhatsApp(event) {
+            event.preventDefault(); // Prevent the default form submission
+            
+            // Verify terms are accepted
+            const termsCheckbox = document.getElementById('terms');
+            if (!termsCheckbox.checked) {
+                alert('You must accept the Terms and Conditions to proceed.');
+                return false;
+            }
+            
+            // Get form data
+            const form = document.getElementById('booking-form');
+            const name = form.elements['name'].value;
+            const email = form.elements['email'].value;
+            const phone = form.elements['phone'].value;
+            const date = form.elements['date'].value;
+            const guests = form.elements['guests'].value;
+            const experience = form.elements['experience'].value || 'Not specified';
+            const message = form.elements['message'].value || 'No special requests';
+            
+            // Format the message for WhatsApp
+            let whatsappMessage = 
+                `*New Booking Request - Sons of Cauvery*\n\n` +
+                `*Name:* ${name}\n` +
+                `*Email:* ${email}\n` +
+                `*Phone:* ${phone}\n` +
+                `*Date:* ${date}\n` +
+                `*Guests:* ${guests}\n` +
+                `*Experience:* ${experience}\n` +
+                `*Message:* ${message}\n\n` +
+                `*Terms and Conditions:* Accepted`;
+            
+            // Encode the message for URL
+            const encodedMessage = encodeURIComponent(whatsappMessage);
+            
+            // Create WhatsApp URL with the admin's number
+            const whatsappURL = `https://wa.me/916360250855?text=${encodedMessage}`;
+            
+            // First submit the form to Formspree
+            fetch(form.action, {
+                method: form.method,
+                body: new FormData(form),
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Show success message
+                    document.getElementById('form-success').style.display = 'block';
+                    form.style.display = 'none';
+                    
+                    // Open WhatsApp in a new tab
+                    window.open(whatsappURL, '_blank');
+                } else {
+                    throw new Error('Form submission failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error submitting your form. Please try again.');
+            });
+            
+            return false; // Prevent default form submission
+        }
+    </script>
+</body>
+</html> 
