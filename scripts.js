@@ -159,4 +159,40 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 5000); // Change testimonial every 5 seconds
     }
+
+    // Simple and reliable slideshow functionality
+    function startSlideshow() {
+        // Hero slideshow
+        const heroSlideshow = document.querySelector('.hero-slideshow');
+        if (heroSlideshow) {
+            const heroSlides = heroSlideshow.querySelectorAll('.hero-slide');
+            if (heroSlides.length > 1) {
+                let heroCurrent = 0;
+                
+                setInterval(() => {
+                    heroSlides.forEach(slide => slide.classList.remove('active'));
+                    heroCurrent = (heroCurrent + 1) % heroSlides.length;
+                    heroSlides[heroCurrent].classList.add('active');
+                }, 4000);
+            }
+        }
+        
+        // Banner slideshow
+        const bannerSlideshow = document.querySelector('.banner-slideshow');
+        if (bannerSlideshow) {
+            const bannerSlides = bannerSlideshow.querySelectorAll('.banner-slide');
+            if (bannerSlides.length > 1) {
+                let bannerCurrent = 0;
+                
+                setInterval(() => {
+                    bannerSlides.forEach(slide => slide.classList.remove('active'));
+                    bannerCurrent = (bannerCurrent + 1) % bannerSlides.length;
+                    bannerSlides[bannerCurrent].classList.add('active');
+                }, 4000);
+            }
+        }
+    }
+    
+    // Start slideshow immediately
+    startSlideshow();
 }); 
