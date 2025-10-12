@@ -195,4 +195,144 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Start slideshow immediately
     startSlideshow();
+
+    // Advanced Image protection functionality
+    function protectImages() {
+        // Disable right-click context menu globally
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Disable drag and drop globally
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Disable all keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Disable F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+P
+            if (e.keyCode === 123 || // F12
+                (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
+                (e.ctrlKey && e.keyCode === 85) || // Ctrl+U
+                (e.ctrlKey && e.keyCode === 83) || // Ctrl+S
+                (e.ctrlKey && e.keyCode === 65) || // Ctrl+A
+                (e.ctrlKey && e.keyCode === 67) || // Ctrl+C
+                (e.ctrlKey && e.keyCode === 86) || // Ctrl+V
+                (e.ctrlKey && e.keyCode === 88) || // Ctrl+X
+                (e.ctrlKey && e.keyCode === 80)) { // Ctrl+P
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Disable text selection globally
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Disable print screen
+        document.addEventListener('keyup', function(e) {
+            if (e.keyCode === 44) { // Print Screen key
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Convert images to canvas to prevent direct saving
+        function convertImagesToCanvas() {
+            const galleryImages = document.querySelectorAll('.gallery-item img');
+            galleryImages.forEach((img, index) => {
+                // Create canvas
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Set canvas size to match image
+                canvas.width = img.naturalWidth || img.width;
+                canvas.height = img.naturalHeight || img.height;
+                
+                // Draw image to canvas
+                ctx.drawImage(img, 0, 0);
+                
+                // Add watermark to canvas
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.font = 'bold 20px Arial';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('Sons of Cauvery', canvas.width - 10, canvas.height - 10);
+                
+                // Add diagonal watermark
+                ctx.save();
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(-Math.PI / 6);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.font = 'bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Sons of Cauvery', 0, 0);
+                ctx.restore();
+                
+                // Replace image with canvas
+                canvas.style.width = '100%';
+                canvas.style.height = 'auto';
+                canvas.style.display = 'block';
+                canvas.classList.add('protected-image');
+                
+                // Hide original image and show canvas
+                img.style.display = 'none';
+                img.parentNode.insertBefore(canvas, img);
+            });
+        }
+
+        // Wait for images to load then convert
+        window.addEventListener('load', function() {
+            setTimeout(convertImagesToCanvas, 1000);
+        });
+
+        // Disable developer tools detection
+        let devtools = {open: false, orientation: null};
+        setInterval(function() {
+            if (window.outerHeight - window.innerHeight > 200 || window.outerWidth - window.innerWidth > 200) {
+                if (!devtools.open) {
+                    devtools.open = true;
+                    document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-size:24px;color:red;">Developer tools detected. Please close them to continue.</div>';
+                }
+            }
+        }, 500);
+
+        // Disable image saving through various methods
+        document.addEventListener('DOMContentLoaded', function() {
+            // Override common image saving methods
+            const originalCreateElement = document.createElement;
+            document.createElement = function(tagName) {
+                const element = originalCreateElement.call(this, tagName);
+                if (tagName.toLowerCase() === 'img') {
+                    element.addEventListener('load', function() {
+                        this.style.pointerEvents = 'none';
+                        this.style.userSelect = 'none';
+                        this.style.webkitUserSelect = 'none';
+                        this.style.mozUserSelect = 'none';
+                        this.style.msUserSelect = 'none';
+                    });
+                }
+                return element;
+            };
+        });
+
+        // Console warning and obfuscation
+        console.clear();
+        console.log('%c⚠️ WARNING ⚠️', 'color: red; font-size: 30px; font-weight: bold;');
+        console.log('%cThis is a browser feature intended for developers only. Unauthorized access to images is prohibited.', 'color: red; font-size: 16px;');
+        console.log('%cAll images are protected by copyright. Do not attempt to download or copy them.', 'color: red; font-size: 14px;');
+        
+        // Disable console methods
+        console.log = function() {};
+        console.warn = function() {};
+        console.error = function() {};
+        console.info = function() {};
+    }
+
+    // Initialize advanced image protection
+    protectImages();
 }); 
