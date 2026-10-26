@@ -501,9 +501,13 @@ footer {
 }
 
 .gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 20px;
+    /* Justified rows: every photo keeps its own shape (nothing is cropped)
+       and the order still reads left to right, top to bottom. */
+    --row-h: 240px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
 }
 
 .gallery-item {
@@ -514,10 +518,12 @@ footer {
     transition: var(--transition);
     background: #dfe9e7;
     cursor: zoom-in;
-    aspect-ratio: 4 / 3;
+    /* --ar (width / height) is set per item by scripts.js */
+    aspect-ratio: var(--ar, 1.333);
+    flex: var(--ar, 1.333) 1 calc(var(--ar, 1.333) * var(--row-h));
+    max-width: min(100%, calc(var(--ar, 1.333) * var(--row-h) * 1.6));
     border: 0;
     padding: 0;
-    width: 100%;
     display: block;
     font: inherit;
 }
@@ -1004,8 +1010,8 @@ body.lb-lock {
     .footer-contact p { justify-content: center; }
 
     .gallery-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        --row-h: 150px;
+        gap: 8px;
     }
 
     .gallery-item .caption { display: none; }

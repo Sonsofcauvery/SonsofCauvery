@@ -136,6 +136,8 @@
         btn.type = 'button';
         btn.className = 'gallery-item ' + (isVideo(item) ? 'video' : 'photo');
         btn.dataset.index = index;
+        var ratio = item.type === 'youtube' ? 16 / 9 : (item.w && item.h ? item.w / item.h : 4 / 3);
+        btn.style.setProperty('--ar', Math.min(Math.max(ratio, 0.4), 3).toFixed(3));
         btn.setAttribute('aria-label', (isVideo(item) ? 'Play video: ' : 'View photo: ') + (item.title || 'Sons of Cauvery'));
         var img = document.createElement('img');
         img.loading = 'lazy';
