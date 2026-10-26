@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-10-26T00:00:00Z",
+ "updated": "2026-10-26T16:03:26.383Z",
  "banner": [
   "image-21",
   "image-32",
@@ -20,7 +20,8 @@
     480,
     960,
     1920
-   ]
+   ],
+   "hidden": true
   },
   {
    "id": "image-2",
