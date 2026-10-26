@@ -4,18 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms and Conditions - Sons of Cauvery</title>
+    <meta name="description" content="Terms and conditions for Sons of Cauvery fishing trips.">
+    <meta name="theme-color" content="#2c7873">
+    <link rel="canonical" href="https://sonsofcauvery.github.io/SonsofCauvery/terms.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Sons of Cauvery">
+    <meta property="og:title" content="Terms and Conditions - Sons of Cauvery">
+    <meta property="og:description" content="Terms and conditions for Sons of Cauvery fishing trips.">
+    <meta property="og:image" content="https://sonsofcauvery.github.io/SonsofCauvery/og-image.jpg">
+    <meta property="og:url" content="https://sonsofcauvery.github.io/SonsofCauvery/terms.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>window.__gallery = fetch('data/gallery.json', { cache: 'no-cache' }).then(function (r) { return r.json(); });</script>
+    <script src="scripts.js" defer></script>
 </head>
 <body>
     <header>
         <nav>
             <div class="logo">
-                <h1>Sons of Cauvery</h1>
+                <a href="index.html">Sons of Cauvery</a>
             </div>
-            <div class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </div>
+            <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+                <svg class="icon" aria-hidden="true"><use href="icons.svg#bars"></use></svg>
+            </button>
             <ul class="nav-menu">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="gallery.html">Gallery</a></li>
@@ -25,14 +38,7 @@
     </header>
 
     <section class="page-banner">
-        <div class="hero-slideshow">
-            <div class="hero-slide active" style="background-image: url('photos-and-videos/Image_21.PNG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_32.JPG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/New_1 Uncle-fotor-20250831213814.png')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_22.PNG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_28.PNG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_15.PNG')"></div>
-        </div>
+        <div class="hero-slideshow" data-banner></div>
         <div class="banner-content">
             <h1>Terms and Conditions</h1>
             <p>Please read our terms carefully before booking</p>
@@ -131,31 +137,31 @@
                         <li><a href="index.html">Home</a></li>
                         <li><a href="gallery.html">Gallery</a></li>
                         <li><a href="contact.html">Contact</a></li>
-                        <li><a href="terms.html">Terms & Conditions</a></li>
+                        <li><a href="terms.html">Terms &amp; Conditions</a></li>
                         <li><a href="cancellation-policy.html">Trip Cancellation Policy</a></li>
                     </ul>
                 </div>
                 <div class="footer-contact">
                     <h3>Contact Us</h3>
-                    <p><i class="fas fa-phone"></i> +91 6360250855</p>
-                    <p><i class="fas fa-envelope"></i> sonsofcauvery@gmail.com</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Cauvery Riverside, Srirangapatna, Karnataka, India</p>
+                    <p><svg class="icon" aria-hidden="true"><use href="icons.svg#phone"></use></svg> <a href="tel:+916360250855">+91 6360250855</a></p>
+                    <p><svg class="icon" aria-hidden="true"><use href="icons.svg#envelope"></use></svg> <a href="mailto:sonsofcauvery@gmail.com">sonsofcauvery@gmail.com</a></p>
+                    <p><svg class="icon" aria-hidden="true"><use href="icons.svg#location-dot"></use></svg> <span>Cauvery Riverside, Srirangapatna, Karnataka, India</span></p>
                 </div>
                 <div class="footer-social">
                     <h3>Follow Us</h3>
                     <div class="social-icons">
-                        <a href="https://www.instagram.com/sonsofcauvery" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.youtube.com/@sonsofcauvery" target="_blank"><i class="fab fa-youtube"></i></a>
-                        <a href="https://wa.me/916360250855" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.instagram.com/sonsofcauvery" target="_blank" rel="noopener" aria-label="Instagram"><svg class="icon" aria-hidden="true"><use href="icons.svg#instagram"></use></svg></a>
+                        <a href="https://www.youtube.com/@sonsofcauvery" target="_blank" rel="noopener" aria-label="YouTube"><svg class="icon" aria-hidden="true"><use href="icons.svg#youtube"></use></svg></a>
+                        <a href="https://wa.me/916360250855" target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="icon" aria-hidden="true"><use href="icons.svg#whatsapp"></use></svg></a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Sons of Cauvery. All rights reserved.</p>
+                <p>&copy; <span data-year>2026</span> Sons of Cauvery. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <script src="scripts.js"></script>
+    <a class="whatsapp-float" href="https://wa.me/916360250855" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><svg class="icon" aria-hidden="true"><use href="icons.svg#whatsapp"></use></svg></a>
 </body>
-</html> 
+</html>

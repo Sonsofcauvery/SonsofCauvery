@@ -4,36 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery - Sons of Cauvery</title>
+    <meta name="description" content="Photos and videos from Sons of Cauvery fishing trips on the Cauvery River: Mahseer catches, riverside camps and scenic spots.">
+    <meta name="theme-color" content="#2c7873">
+    <link rel="canonical" href="https://sonsofcauvery.github.io/SonsofCauvery/gallery.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Sons of Cauvery">
+    <meta property="og:title" content="Gallery - Sons of Cauvery">
+    <meta property="og:description" content="Photos and videos from Sons of Cauvery fishing trips on the Cauvery River: Mahseer catches, riverside camps and scenic spots.">
+    <meta property="og:image" content="https://sonsofcauvery.github.io/SonsofCauvery/og-image.jpg">
+    <meta property="og:url" content="https://sonsofcauvery.github.io/SonsofCauvery/gallery.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+    <script>window.__gallery = fetch('data/gallery.json', { cache: 'no-cache' }).then(function (r) { return r.json(); });</script>
+    <script src="scripts.js" defer></script>
 </head>
 <body>
     <header>
         <nav>
             <div class="logo">
-                <h1>Sons of Cauvery</h1>
+                <a href="index.html">Sons of Cauvery</a>
             </div>
-            <div class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </div>
+            <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+                <svg class="icon" aria-hidden="true"><use href="icons.svg#bars"></use></svg>
+            </button>
             <ul class="nav-menu">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="gallery.html" class="active">Gallery</a></li>
+                <li><a href="gallery.html" class="active" aria-current="page">Gallery</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
         </nav>
     </header>
 
     <section class="page-banner">
-        <div class="hero-slideshow">
-            <div class="hero-slide active" style="background-image: url('photos-and-videos/Image_21.PNG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_32.JPG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/New_1 Uncle-fotor-20250831213814.png')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_22.PNG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_28.PNG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_15.PNG')"></div>
-        </div>
+        <div class="hero-slideshow" data-banner></div>
         <div class="banner-content">
             <h1>Our Gallery</h1>
             <p>Explore photos and videos from our fishing adventures</p>
@@ -42,239 +47,13 @@
 
     <section class="gallery-section">
         <div class="container">
-            <div class="gallery-tabs">
+            <div class="gallery-tabs" role="group" aria-label="Filter gallery">
                 <button class="tab-btn active" data-filter="all">All</button>
                 <button class="tab-btn" data-filter="photo">Photos</button>
                 <button class="tab-btn" data-filter="video">Videos</button>
             </div>
-
-            <div class="gallery-grid">
-                <!-- Photos -->
-                <!-- New Images Added -->
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_1.jpeg" data-lightbox="gallery" data-title="Fishing Adventure">
-                        <img src="photos-and-videos/Image_1.jpeg" alt="Fishing Adventure">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_2.jpg" data-lightbox="gallery" data-title="Foreign Adventure">
-                        <img src="photos-and-videos/Image_2.jpg" alt="Foreign Adventure">
-                    </a>
-                </div>
-
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/image_42_Kishan.jpeg" data-lightbox="gallery" data-title="Fishing Adventure">
-                        <img src="photos-and-videos/image_42_Kishan.jpeg" alt="Fishing Adventure">
-                    </a>
-                </div>
-
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_3.png" data-lightbox="gallery" data-title="Rain Forest Adventure">
-                        <img src="photos-and-videos/Image_3.png" alt="Rain Forest Adventure">
-                    </a>
-                </div>
-
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_4.jpg" data-lightbox="gallery" data-title="Foreign Adventure">
-                        <img src="photos-and-videos/Image_4.jpg" alt="Foreign Adventure">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_5.jpg" data-lightbox="gallery" data-title="Fishing Moment">
-                        <img src="photos-and-videos/Image_5.jpg" alt="Fishing Moment">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_6.jpg" data-lightbox="gallery" data-title="Foreign Adventure">
-                        <img src="photos-and-videos/Image_6.jpg" alt="Foreign Adventure">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/image_41_Kishan.jpeg" data-lightbox="gallery" data-title="Fishing Adventure">
-                        <img src="photos-and-videos/image_41_Kishan.jpeg" alt="Fishing Adventure">
-                    </a>
-                </div>    
-
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_8.jpg" data-lightbox="gallery" data-title="Foreign Adventure">
-                        <img src="photos-and-videos/Image_8.jpg" alt="Foreign Adventure">
-                    </a>
-                </div>
-             
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_10.jpg" data-lightbox="gallery" data-title="Fishing Adventure">
-                        <img src="photos-and-videos/Image_10.jpg" alt="Fishing Adventure">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_11.PNG" data-lightbox="gallery" data-title="Fishing Activity">
-                        <img src="photos-and-videos/Image_11.PNG" alt="Fishing Activity">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_12.PNG" data-lightbox="gallery" data-title="Fishing Snapshot">
-                        <img src="photos-and-videos/Image_12.PNG" alt="Fishing Snapshot">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_13.PNG" data-lightbox="gallery" data-title="River View">
-                        <img src="photos-and-videos/Image_13.PNG" alt="River View">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_14.PNG" data-lightbox="gallery" data-title="Fishing Experience">
-                        <img src="photos-and-videos/Image_14.PNG" alt="Fishing Experience">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_15.PNG" data-lightbox="gallery" data-title="Cauvery Fishing">
-                        <img src="photos-and-videos/Image_15.PNG" alt="Cauvery Fishing">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_16.jpg" data-lightbox="gallery" data-title="Fishing Adventure">
-                        <img src="photos-and-videos/Image_16.jpg" alt="Fishing Adventure">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_17.jpg" data-lightbox="gallery" data-title="Fishing at Cauvery">
-                        <img src="photos-and-videos/Image_17.jpg" alt="Fishing at Cauvery">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_18.jpg" data-lightbox="gallery" data-title="River Fishing">
-                        <img src="photos-and-videos/Image_18.jpg" alt="River Fishing">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_19.jpg" data-lightbox="gallery" data-title="Fishing Spot">
-                        <img src="photos-and-videos/Image_19.jpg" alt="Fishing Spot">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_20.PNG" data-lightbox="gallery" data-title="Beautiful Catch">
-                        <img src="photos-and-videos/Image_20.PNG" alt="Beautiful Catch">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_21.PNG" data-lightbox="gallery" data-title="Fishing Experience">
-                        <img src="photos-and-videos/Image_21.PNG" alt="Fishing Experience">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_22.PNG" data-lightbox="gallery" data-title="Riverside">
-                        <img src="photos-and-videos/Image_22.PNG" alt="Riverside">
-                    </a>
-                </div>
-                <!-- New Photos Added -->
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_23.JPG" data-lightbox="gallery" data-title="Fishing Adventure">
-                        <img src="photos-and-videos/Image_23.JPG" alt="Fishing Adventure">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_24.jpg" data-lightbox="gallery" data-title="Cauvery Fishing">
-                        <img src="photos-and-videos/Image_24.jpg" alt="Cauvery Fishing">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_25.jpg" data-lightbox="gallery" data-title="Fishing Experience">
-                        <img src="photos-and-videos/Image_25.jpg" alt="Fishing Experience">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_26.JPG" data-lightbox="gallery" data-title="River Fishing">
-                        <img src="photos-and-videos/Image_26.JPG" alt="River Fishing">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_27.JPG" data-lightbox="gallery" data-title="Caught Fish">
-                        <img src="photos-and-videos/Image_27.JPG" alt="Caught Fish">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_28.PNG" data-lightbox="gallery" data-title="Fishing Technique">
-                        <img src="photos-and-videos/Image_28.PNG" alt="Fishing Technique">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_29.JPG" data-lightbox="gallery" data-title="Riverside View">
-                        <img src="photos-and-videos/Image_29.JPG" alt="Riverside View">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_30.jpg" data-lightbox="gallery" data-title="Fishing Spot">
-                        <img src="photos-and-videos/Image_30.jpg" alt="Fishing Spot">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_31.PNG" data-lightbox="gallery" data-title="Fishing Activity">
-                        <img src="photos-and-videos/Image_31.PNG" alt="Fishing Activity">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_32.JPG" data-lightbox="gallery" data-title="Cauvery River">
-                        <img src="photos-and-videos/Image_32.JPG" alt="Cauvery River">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_33.PNG" data-lightbox="gallery" data-title="Fish Catch">
-                        <img src="photos-and-videos/Image_33.PNG" alt="Fish Catch">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_34.JPG" data-lightbox="gallery" data-title="Riverside Fishing">
-                        <img src="photos-and-videos/Image_34.JPG" alt="Riverside Fishing">
-                    </a>
-                </div>
-
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_36.jpg" data-lightbox="gallery" data-title="Cauvery Expedition">
-                        <img src="photos-and-videos/Image_36.jpg" alt="Cauvery Expedition">
-                    </a>
-                </div>
-
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_38.JPG" data-lightbox="gallery" data-title="Riverside Scenery">
-                        <img src="photos-and-videos/Image_38.JPG" alt="Riverside Scenery">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_39.JPG" data-lightbox="gallery" data-title="Fishing Day">
-                        <img src="photos-and-videos/Image_39.JPG" alt="Fishing Day">
-                    </a>
-                </div>
-                <div class="gallery-item photo">
-                    <a href="photos-and-videos/Image_40.PNG" data-lightbox="gallery" data-title="River View">
-                        <img src="photos-and-videos/Image_40.PNG" alt="River View">
-                    </a>
-                </div>
-
-                <!-- Videos -->
-                <div class="gallery-item video">
-                    <div class="video-container">
-                        <video controls poster="photos-and-videos/Video_1.mp4">
-                            <source src="photos-and-videos/Video_1.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <div class="video-overlay">
-                            <i class="fas fa-play"></i>
-                        </div>
-                    </div>
-                    <h3>Fishing Adventure</h3>
-                </div>
-                <div class="gallery-item video">
-                    <div class="video-container">
-                        <video controls>
-                            <source src="photos-and-videos/Video_2.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <div class="video-overlay">
-                            <i class="fas fa-play"></i>
-                        </div>
-                    </div>
-                    <h3>River Fishing Experience</h3>
-                </div>
+            <div class="gallery-grid" data-gallery>
+                <noscript><p class="gallery-empty">Please enable JavaScript to view the gallery.</p></noscript>
             </div>
         </div>
     </section>
@@ -300,32 +79,31 @@
                         <li><a href="index.html">Home</a></li>
                         <li><a href="gallery.html">Gallery</a></li>
                         <li><a href="contact.html">Contact</a></li>
-                        <li><a href="terms.html">Terms & Conditions</a></li>
+                        <li><a href="terms.html">Terms &amp; Conditions</a></li>
                         <li><a href="cancellation-policy.html">Trip Cancellation Policy</a></li>
                     </ul>
                 </div>
                 <div class="footer-contact">
                     <h3>Contact Us</h3>
-                    <p><i class="fas fa-phone"></i> +91 6360250855</p>
-                    <p><i class="fas fa-envelope"></i> sonsofcauvery@gmail.com</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Cauvery Riverside, Srirangapatna, Karnataka, India</p>
+                    <p><svg class="icon" aria-hidden="true"><use href="icons.svg#phone"></use></svg> <a href="tel:+916360250855">+91 6360250855</a></p>
+                    <p><svg class="icon" aria-hidden="true"><use href="icons.svg#envelope"></use></svg> <a href="mailto:sonsofcauvery@gmail.com">sonsofcauvery@gmail.com</a></p>
+                    <p><svg class="icon" aria-hidden="true"><use href="icons.svg#location-dot"></use></svg> <span>Cauvery Riverside, Srirangapatna, Karnataka, India</span></p>
                 </div>
                 <div class="footer-social">
                     <h3>Follow Us</h3>
                     <div class="social-icons">
-                        <a href="https://www.instagram.com/sonsofcauvery" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.youtube.com/@sonsofcauvery" target="_blank"><i class="fab fa-youtube"></i></a>
-                        <a href="https://wa.me/916360250855" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.instagram.com/sonsofcauvery" target="_blank" rel="noopener" aria-label="Instagram"><svg class="icon" aria-hidden="true"><use href="icons.svg#instagram"></use></svg></a>
+                        <a href="https://www.youtube.com/@sonsofcauvery" target="_blank" rel="noopener" aria-label="YouTube"><svg class="icon" aria-hidden="true"><use href="icons.svg#youtube"></use></svg></a>
+                        <a href="https://wa.me/916360250855" target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="icon" aria-hidden="true"><use href="icons.svg#whatsapp"></use></svg></a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Sons of Cauvery. All rights reserved.</p>
+                <p>&copy; <span data-year>2026</span> Sons of Cauvery. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
-    <script src="scripts.js"></script>
+    <a class="whatsapp-float" href="https://wa.me/916360250855" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><svg class="icon" aria-hidden="true"><use href="icons.svg#whatsapp"></use></svg></a>
 </body>
-</html> 
+</html>

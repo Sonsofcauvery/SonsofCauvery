@@ -1,74 +1,50 @@
 # Sons of Cauvery - Fishing Camp Website
 
-This is a responsive website for the Sons of Cauvery fishing camp, showcasing their services, photo/video gallery, and contact information.
+Live site: https://sonsofcauvery.github.io/SonsofCauvery/
+Gallery admin: https://sonsofcauvery.github.io/SonsofCauvery/admin.html
 
-## Features
+## Managing photos and videos (no code, no git)
 
-- **Responsive Design**: Works well on desktops, tablets, and mobile devices
-- **Modern UI**: Clean, attractive layout with smooth animations
-- **Photo and Video Gallery**: Displays images and videos with filtering options
-- **Contact Form**: Allows visitors to submit booking requests
-- **Responsive Navigation**: Mobile-friendly menu with smooth transitions
+Open **admin.html** on a phone or computer and enter the passcode. From there you can:
 
-## Pages
+- **Add photos / videos**: pick one or many files. Photos are resized and compressed automatically.
+- **Reorder**: drag a picture to a new spot (on a phone, press and hold it for a moment first), or tap **1st** to move it straight to the top.
+- **Banner slideshow**: tap the star on a photo to add it to the banner at the top of every page, and drag the banner thumbnails to change their order.
+- **Edit titles**, **hide** items without deleting them (eye button), or **delete** them (bin button).
+- **Add YouTube video**: paste a link. Use this for long videos.
+- Press **Publish changes**. The website updates in about 1 minute.
 
-1. **Home (index.html)**: Main landing page with an overview of the fishing camp
-2. **Gallery (gallery.html)**: Photo and video gallery with filtering options
-3. **Contact (contact.html)**: Contact information and booking request form
+Videos must be under 45 MB. iPhone videos recorded in HEVC may not play in every browser, so upload long or iPhone videos to YouTube and add the link.
 
-## File Structure
+The first 8 gallery items also show in the "From Our Gallery" section on the home page.
+
+## One-time admin setup
+
+1. Push this folder to the `main` branch of `Sonsofcauvery/SonsofCauvery` (GitHub Pages keeps serving the same URL).
+2. Create a GitHub fine-grained token at https://github.com/settings/personal-access-tokens/new
+   - Repository access: **Only select repositories**, then pick `SonsofCauvery`
+   - Permissions, Repository permissions: **Contents: Read and write**
+   - Expiration: the longest option available
+3. Open `admin.html` on the live site, paste the token, choose a passcode and save.
+4. Share only the **passcode** with whoever should manage the gallery.
+
+When the token expires, open admin.html, unlock, go to **Settings** and paste a new one. You can change the passcode there too.
+
+### How it's protected
+
+The token is saved in `data/admin-config.json`, encrypted with the passcode (PBKDF2 with 600,000 rounds, then AES-256-GCM). Visitors without the passcode can't change anything. Because the encrypted file is public, use a long passcode (a short sentence works well). The token can only change this one repository, and every change is a git commit, so any mistake can be undone from the GitHub history.
+
+## Files
 
 ```
-Sons of Cauvery/
-│
-├── index.html             # Homepage
-├── gallery.html           # Gallery page
-├── contact.html           # Contact page
-├── styles.css             # CSS styles
-├── scripts.js             # JavaScript functionality
-├── photos-and-videos/     # Directory containing photos and videos
-└── README.md              # This file
+index.html, gallery.html, contact.html, terms.html, cancellation-policy.html, 404.html
+admin.html, admin.js      Gallery admin page
+scripts.js                Site behaviour: banner, gallery, viewer, booking form
+styles.css                All styles (colours are at the top in :root)
+icons.svg                 Icons (Font Awesome Free, CC BY 4.0)
+data/gallery.json         Gallery order, titles and banner list (edited by admin.html)
+media/                    Compressed photos (WebP, 480/960/1920 px wide) and videos
+vendor/Sortable.min.js    Drag-and-drop library used by the admin page
 ```
 
-## How to Use
-
-1. Open `index.html` in a web browser to view the website
-2. Navigate through the pages using the navigation menu
-3. View the gallery and filter between photos and videos
-4. Fill out the contact form to submit a booking request
-
-## Media Files
-
-The website uses photos and videos from the `photos-and-videos` folder:
-
-- Photos: PNG and JPG files showcasing fishing experiences
-- Videos: MP4 and MOV files showing fishing activities
-
-## Tech Stack
-
-- HTML5
-- CSS3 (with custom variables and responsive design)
-- JavaScript (vanilla)
-- Font Awesome icons
-- Lightbox2 for image gallery
-
-## Browser Compatibility
-
-The website is compatible with:
-- Google Chrome
-- Mozilla Firefox
-- Safari
-- Microsoft Edge
-- Opera
-
-## Local Development
-
-To modify the website:
-
-1. Edit HTML files to change content structure
-2. Modify `styles.css` to adjust styling
-3. Update `scripts.js` to change interactive functionality
-
----
-
-&copy; 2024 Sons of Cauvery. All rights reserved. 
+Each photo is stored in three sizes so phones download small versions and big screens get sharp ones. Photos load only as you scroll to them.
