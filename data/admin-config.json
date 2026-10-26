@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "note": "Gallery admin settings. The GitHub key is encrypted with the admin passcode.",
+  "owner": "sonsofcauvery",
+  "repo": "SonsofCauvery",
+  "branch": "main",
+  "kdf": "PBKDF2-SHA256",
+  "iterations": 600000,
+  "salt": "vu7DuJaVNolwxhndchZe2g==",
+  "iv": "/1//CHKM+fFjnDnP",
+  "token": "UFJ6QqGah3hxupY0jjLFmSWt54ex7/qb16g9ZW6JO6o7qDD+PFQSOXjWudsKnz6M/n/CNMy9LPIicjDGJxTOkIl45t63RHqGyb0jkV1iiFP3FzKSEAnmyvFf5e0WVOezuQk3vL5/F3F50s3vbg=="
+}
