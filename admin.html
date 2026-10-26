@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Gallery Admin - Sons of Cauvery</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <style>
+        :root {
+            --primary: #2c7873;
+            --secondary: #6fb98f;
+            --accent: #f2b705;
+            --dark: #2b3a42;
+            --light: #f4f7f6;
+            --danger: #c0392b;
+            --radius: 8px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: #333;
+            line-height: 1.5;
+            padding-bottom: 90px;
+        }
+        a { color: var(--primary); }
+        .icon { width: 1em; height: 1em; fill: currentColor; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+        header {
+            background: var(--dark);
+            color: #fff;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        header h1 { font-size: 1.15rem; }
+        header h1 span { color: var(--accent); font-weight: 400; }
+        header .links { display: flex; gap: 14px; font-size: 0.9rem; white-space: nowrap; }
+        header .links a, header .links button { color: #fff; opacity: 0.85; background: none; border: 0; font: inherit; cursor: pointer; text-decoration: underline; }
+        main { max-width: 1100px; margin: 0 auto; padding: 20px 16px; }
+        .card {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .narrow { max-width: 520px; margin: 40px auto; }
+        h2 { font-size: 1.25rem; color: var(--dark); margin-bottom: 6px; }
+        .hint { color: #666; font-size: 0.92rem; margin-bottom: 14px; }
+        label { display: block; font-weight: 600; margin: 12px 0 4px; font-size: 0.95rem; }
+        input[type=text], input[type=password], input[type=url] {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #ccd5d3;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        input:focus { outline: 2px solid var(--secondary); border-color: var(--primary); }
+        .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 18px;
+            border-radius: 6px;
+            border: 0;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn:hover { background: #24625e; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn.secondary { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+        .btn.accent { background: var(--accent); color: var(--dark); }
+        .btn.danger { background: var(--danger); }
+        .msg { padding: 10px 12px; border-radius: 6px; margin-top: 12px; font-size: 0.93rem; display: none; }
+        .msg.show { display: block; }
+        .msg.error { background: #fdecea; color: #8a1f12; }
+        .msg.ok { background: #e6f4ea; color: #1e5e2f; }
+        .msg.info { background: #eef6f5; color: var(--dark); }
+        ol.steps { padding-left: 20px; font-size: 0.93rem; color: #444; }
+        ol.steps li { margin-bottom: 6px; }
+        details { margin-top: 10px; }
+        summary { cursor: pointer; color: var(--primary); font-weight: 600; }
+        .check { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-weight: 400; }
+        .hidden { display: none !important; }
+
+        /* Banner strip */
+        .banner-strip { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 10px; min-height: 90px; }
+        .banner-strip:empty::before { content: 'No banner photos yet. Tap the star on a photo below to add it.'; color: #888; font-size: 0.9rem; align-self: center; }
+        .b-thumb { position: relative; flex: 0 0 140px; height: 80px; border-radius: 6px; overflow: hidden; background: #dfe9e7; cursor: grab; }
+        .b-thumb img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        .b-thumb .num { position: absolute; left: 6px; top: 6px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.75rem; padding: 1px 7px; border-radius: 10px; }
+        .b-thumb button { position: absolute; right: 4px; top: 4px; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(0,0,0,0.6); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* Gallery grid */
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+        .yt-form { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .yt-form input { flex: 1 1 260px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+        .tile {
+            background: #fff;
+            border: 1px solid #e1e8e6;
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .tile.is-hidden .thumb img { opacity: 0.35; }
+        .thumb { position: relative; aspect-ratio: 4 / 3; background: #dfe9e7; cursor: grab; }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+        .thumb .pos { position: absolute; left: 8px; top: 8px; background: rgba(0,0,0,0.65); color: #fff; font-size: 0.8rem; font-weight: 700; padding: 2px 9px; border-radius: 12px; }
+        .thumb .badge { position: absolute; right: 8px; top: 8px; background: rgba(0,0,0,0.65); color: #fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; display: flex; gap: 5px; align-items: center; }
+        .thumb .grip { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); background: rgba(255,255,255,0.9); color: var(--dark); font-size: 0.75rem; padding: 2px 10px; border-radius: 12px; display: flex; gap: 6px; align-items: center; }
+        .thumb .hidden-flag { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--dark); }
+        .progress { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: rgba(0,0,0,0.15); }
+        .progress div { height: 100%; width: 0; background: var(--accent); transition: width 0.2s; }
+        .tile .body { padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+        .tile input { padding: 7px 9px; font-size: 0.9rem; }
+        .actions { display: flex; gap: 6px; }
+        .actions button {
+            flex: 1;
+            border: 1px solid #d5dfdc;
+            background: #fff;
+            border-radius: 6px;
+            padding: 7px 0;
+            cursor: pointer;
+            color: var(--dark);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .actions button:hover { background: #eef6f5; }
+        .actions button.on { background: var(--accent); border-color: var(--accent); }
+        .actions button.del:hover { background: #fdecea; color: var(--danger); }
+        .sortable-ghost { opacity: 0.35; }
+        .sortable-chosen .thumb { outline: 3px solid var(--accent); }
+
+        /* Publish bar */
+        .publish-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            z-index: 20;
+        }
+        .publish-bar .status { font-size: 0.92rem; color: #555; }
+        .publish-bar .status strong { color: var(--dark); }
+        .drop-hint { border: 2px dashed var(--secondary); border-radius: var(--radius); padding: 18px; text-align: center; color: #557; margin-bottom: 16px; }
+        .drop-hint.over { background: #eef6f5; }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .tile input { font-size: 0.85rem; }
+            .actions button { padding: 8px 0; }
+            header .links { gap: 10px; font-size: 0.85rem; }
+            .publish-bar .btn { padding: 11px 14px; }
+            .drop-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sons of Cauvery <span>Gallery Admin</span></h1>
+        <div class="links">
+            <a href="gallery.html" target="_blank" rel="noopener">View site</a>
+            <button id="btn-settings" class="hidden">Settings</button>
+            <button id="btn-lock" class="hidden">Lock</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Loading -->
+        <section id="view-loading" class="card narrow">
+            <p>Loading...</p>
+        </section>
+
+        <!-- Unlock -->
+        <section id="view-unlock" class="card narrow hidden">
+            <h2>Enter passcode</h2>
+            <p class="hint">Only people with the passcode can change the gallery.</p>
+            <form id="form-unlock">
+                <label for="unlock-pass">Passcode</label>
+                <input type="password" id="unlock-pass" autocomplete="current-password" required>
+                <label class="check"><input type="checkbox" id="unlock-remember"> Keep me unlocked on this device</label>
+                <div class="row" style="margin-top:16px">
+                    <button class="btn" type="submit"><svg class="icon"><use href="icons.svg#lock"></use></svg> Unlock</button>
+                </div>
+                <div class="msg" id="unlock-msg"></div>
+            </form>
+        </section>
+
+        <!-- One-time setup -->
+        <section id="view-setup" class="card narrow hidden">
+            <h2 id="setup-title">One-time setup</h2>
+            <p class="hint" id="setup-hint">Do this once. After that, you and your friend only need the passcode.</p>
+            <details id="token-help" open>
+                <summary>How to get a GitHub key (2 minutes)</summary>
+                <ol class="steps" style="margin-top:8px">
+                    <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub: new fine-grained token</a> (sign in to the account that owns the website).</li>
+                    <li>Name it "Gallery admin" and set <b>Expiration</b> to the longest option.</li>
+                    <li>Under <b>Repository access</b>, choose <b>Only select repositories</b> and pick the website repository.</li>
+                    <li>Under <b>Permissions → Repository permissions</b>, set <b>Contents</b> to <b>Read and write</b>.</li>
+                    <li>Click <b>Generate token</b>, copy it and paste it below.</li>
+                </ol>
+            </details>
+            <form id="form-setup">
+                <div class="row" style="gap:10px">
+                    <div style="flex:1 1 180px">
+                        <label for="setup-owner">GitHub username</label>
+                        <input type="text" id="setup-owner" required autocapitalize="off" spellcheck="false">
+                    </div>
+                    <div style="flex:1 1 180px">
+                        <label for="setup-repo">Repository name</label>
+                        <input type="text" id="setup-repo" required autocapitalize="off" spellcheck="false">
+                    </div>
+                </div>
+                <label for="setup-branch">Branch</label>
+                <input type="text" id="setup-branch" value="main" required autocapitalize="off" spellcheck="false">
+                <div id="setup-token-wrap">
+                    <label for="setup-token">GitHub key (token)</label>
+                    <input type="password" id="setup-token" autocomplete="off" spellcheck="false" placeholder="github_pat_...">
+                </div>
+                <label for="setup-pass">Choose a passcode</label>
+                <input type="password" id="setup-pass" autocomplete="new-password" required minlength="8" placeholder="e.g. three or four words you'll remember">
+                <label for="setup-pass2">Type the passcode again</label>
+                <input type="password" id="setup-pass2" autocomplete="new-password" required minlength="8">
+                <p class="hint" style="margin-top:8px">Use at least 8 characters. A short sentence like <i>mahseer river morning 2026</i> is strong and easy to share with your friend.</p>
+                <div class="row" style="margin-top:12px">
+                    <button class="btn" type="submit" id="setup-submit">Save setup</button>
+                    <button class="btn secondary hidden" type="button" id="setup-cancel">Cancel</button>
+                </div>
+                <div class="msg" id="setup-msg"></div>
+            </form>
+        </section>
+
+        <!-- Editor -->
+        <section id="view-editor" class="hidden">
+            <div class="card">
+                <h2>Banner slideshow</h2>
+                <p class="hint">These photos rotate at the top of every page. Drag to change the order. Add photos with the <svg class="icon"><use href="icons.svg#star"></use></svg> button below.</p>
+                <div class="banner-strip" id="banner-strip"></div>
+            </div>
+
+            <div class="card">
+                <h2>Gallery</h2>
+                <p class="hint">Drag photos and videos by the picture to rearrange them (on a phone, press and hold a picture for a moment, then drag). The 1st button moves an item straight to the top. Number 1 shows first on the website, and the first 8 also appear on the home page.</p>
+                <div class="toolbar">
+                    <label class="btn accent" style="margin:0">
+                        <svg class="icon"><use href="icons.svg#cloud-arrow-up"></use></svg> Add photos / videos
+                        <input type="file" id="file-input" accept="image/*,video/mp4,video/quicktime,video/webm" multiple hidden>
+                    </label>
+                    <button class="btn secondary" id="btn-youtube" type="button"><svg class="icon"><use href="icons.svg#youtube"></use></svg> Add YouTube video</button>
+                </div>
+                <form class="yt-form hidden" id="yt-form">
+                    <input type="url" id="yt-url" placeholder="Paste a YouTube link, e.g. https://youtu.be/..." required>
+                    <input type="text" id="yt-title" placeholder="Title (optional)">
+                    <button class="btn" type="submit">Add</button>
+                </form>
+                <div class="drop-hint" id="drop-zone">Or drop photos and videos here</div>
+                <p class="hint" style="margin-bottom:12px">Photos are resized and compressed automatically. Videos must be under 45 MB; for longer videos, upload to YouTube and add the link instead.</p>
+                <div class="grid" id="grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <div class="publish-bar hidden" id="publish-bar">
+        <div class="status" id="publish-status">No changes</div>
+        <button class="btn" id="btn-publish" disabled>Publish changes</button>
+    </div>
+
+    <template id="tpl-tile">
+        <div class="tile">
+            <div class="thumb">
+                <img alt="">
+                <span class="pos"></span>
+                <span class="badge hidden"></span>
+                <span class="grip"><svg class="icon"><use href="icons.svg#grip-vertical"></use></svg> drag</span>
+                <div class="progress hidden"><div></div></div>
+            </div>
+            <div class="body">
+                <input type="text" class="title" placeholder="Title" maxlength="80">
+                <div class="actions">
+                    <button type="button" class="top" title="Move to first place" aria-label="Move to first place">1st</button>
+                    <button type="button" class="star" title="Use in banner slideshow" aria-label="Use in banner slideshow"><svg class="icon"><use href="icons.svg#star"></use></svg></button>
+                    <button type="button" class="vis" title="Hide from gallery" aria-label="Hide from gallery"><svg class="icon"><use href="icons.svg#eye"></use></svg></button>
+                    <button type="button" class="del" title="Delete" aria-label="Delete"><svg class="icon"><use href="icons.svg#trash-can"></use></svg></button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="vendor/Sortable.min.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

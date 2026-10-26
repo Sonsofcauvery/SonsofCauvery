@@ -4,20 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sons of Cauvery - Fishing Camp</title>
+    <meta name="description" content="Guided Mahseer fishing trips on the Cauvery River near Srirangapatna, Karnataka. Expert guides, quality equipment and scenic riverside spots.">
+    <meta name="theme-color" content="#2c7873">
+    <link rel="canonical" href="https://sonsofcauvery.github.io/SonsofCauvery/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Sons of Cauvery">
+    <meta property="og:title" content="Sons of Cauvery - Fishing Camp">
+    <meta property="og:description" content="Guided Mahseer fishing trips on the Cauvery River near Srirangapatna, Karnataka. Expert guides, quality equipment and scenic riverside spots.">
+    <meta property="og:image" content="https://sonsofcauvery.github.io/SonsofCauvery/og-image.jpg">
+    <meta property="og:url" content="https://sonsofcauvery.github.io/SonsofCauvery/">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>window.__gallery = fetch('data/gallery.json', { cache: 'no-cache' }).then(function (r) { return r.json(); });</script>
+    <script src="scripts.js" defer></script>
 </head>
 <body>
     <header>
         <nav>
             <div class="logo">
-                <h1>Sons of Cauvery</h1>
+                <a href="index.html">Sons of Cauvery</a>
             </div>
-            <div class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </div>
+            <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+                <svg class="icon" aria-hidden="true"><use href="icons.svg#bars"></use></svg>
+            </button>
             <ul class="nav-menu">
-                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="index.html" class="active" aria-current="page">Home</a></li>
                 <li><a href="gallery.html">Gallery</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
@@ -25,14 +38,7 @@
     </header>
 
     <section class="hero">
-        <div class="hero-slideshow">
-            <div class="hero-slide active" style="background-image: url('photos-and-videos/Image_21.PNG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_32.JPG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/New_1 Uncle-fotor-20250831213814.png')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_22.PNG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_28.PNG')"></div>
-            <div class="hero-slide" style="background-image: url('photos-and-videos/Image_15.PNG')"></div>
-        </div>
+        <div class="hero-slideshow" data-banner></div>
         <div class="hero-content">
             <h1>Welcome to Sons of Cauvery</h1>
             <h2>Experience The Ultimate Fishing Adventure</h2>
@@ -50,7 +56,11 @@
                     <a href="gallery.html" class="btn">View Our Gallery</a>
                 </div>
                 <div class="about-image">
-                    <img src="photos-and-videos/Image_22.PNG" alt="Fishing at Sons of Cauvery">
+                    <img src="media/image-22-960.webp"
+                         srcset="media/image-22-480.webp 480w, media/image-22-960.webp 960w, media/image-22-1920.webp 1920w"
+                         sizes="(max-width: 992px) 90vw, 560px"
+                         width="960" height="540" loading="lazy" decoding="async"
+                         alt="Fishing on the Cauvery River with Sons of Cauvery">
                 </div>
             </div>
         </div>
@@ -61,25 +71,35 @@
             <h2>What We Offer</h2>
             <div class="features-grid">
                 <div class="feature-card">
-                    <i class="fas fa-fish"></i>
+                    <svg class="icon" aria-hidden="true"><use href="icons.svg#fish"></use></svg>
                     <h3>Guided Fishing Tours</h3>
                     <p>Expert guides with deep knowledge of the Cauvery River and its fish species.</p>
                 </div>
                 <div class="feature-card">
-                    <i class="fas fa-campground"></i>
+                    <svg class="icon" aria-hidden="true"><use href="icons.svg#campground"></use></svg>
                     <h3>Camping Facilities</h3>
                     <p>Comfortable accommodation options ranging from tents to riverside cottages.</p>
                 </div>
                 <div class="feature-card">
-                    <i class="fas fa-utensils"></i>
+                    <svg class="icon" aria-hidden="true"><use href="icons.svg#utensils"></use></svg>
                     <h3>Refreshment</h3>
                     <p>Snacks and Hydration stored in our coolerbox.</p>
                 </div>
                 <div class="feature-card">
-                    <i class="fas fa-map-marked-alt"></i>
+                    <svg class="icon" aria-hidden="true"><use href="icons.svg#map-location-dot"></use></svg>
                     <h3>Scenic Locations</h3>
                     <p>Access to exclusive fishing spots with breathtaking views of the river.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery-preview">
+        <div class="container">
+            <h2>From Our Gallery</h2>
+            <div class="gallery-grid" data-gallery data-limit="8"></div>
+            <div class="center">
+                <a href="gallery.html" class="btn">See All Photos &amp; Videos</a>
             </div>
         </div>
     </section>
@@ -111,6 +131,23 @@
             <a href="contact.html" class="btn">Contact Us Now</a>
         </div>
     </section>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TouristAttraction",
+        "name": "Sons of Cauvery",
+        "description": "Guided Mahseer fishing trips on the Cauvery River near Srirangapatna, Karnataka.",
+        "telephone": "+91 6360250855",
+        "email": "sonsofcauvery@gmail.com",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Srirangapatna",
+            "addressRegion": "Karnataka",
+            "addressCountry": "IN"
+        },
+        "sameAs": ["https://www.instagram.com/sonsofcauvery", "https://www.youtube.com/@sonsofcauvery"]
+    }
+    </script>
 
     <footer>
         <div class="container">
@@ -125,31 +162,31 @@
                         <li><a href="index.html">Home</a></li>
                         <li><a href="gallery.html">Gallery</a></li>
                         <li><a href="contact.html">Contact</a></li>
-                        <li><a href="terms.html">Terms & Conditions</a></li>
+                        <li><a href="terms.html">Terms &amp; Conditions</a></li>
                         <li><a href="cancellation-policy.html">Trip Cancellation Policy</a></li>
                     </ul>
                 </div>
                 <div class="footer-contact">
                     <h3>Contact Us</h3>
-                    <p><i class="fas fa-phone"></i> +91 6360250855</p>
-                    <p><i class="fas fa-envelope"></i> sonsofcauvery@gmail.com</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Cauvery Riverside, Srirangapatna, Karnataka, India</p>
+                    <p><svg class="icon" aria-hidden="true"><use href="icons.svg#phone"></use></svg> <a href="tel:+916360250855">+91 6360250855</a></p>
+                    <p><svg class="icon" aria-hidden="true"><use href="icons.svg#envelope"></use></svg> <a href="mailto:sonsofcauvery@gmail.com">sonsofcauvery@gmail.com</a></p>
+                    <p><svg class="icon" aria-hidden="true"><use href="icons.svg#location-dot"></use></svg> <span>Cauvery Riverside, Srirangapatna, Karnataka, India</span></p>
                 </div>
                 <div class="footer-social">
                     <h3>Follow Us</h3>
                     <div class="social-icons">
-                        <a href="https://www.instagram.com/sonsofcauvery" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.youtube.com/@sonsofcauvery" target="_blank"><i class="fab fa-youtube"></i></a>
-                        <a href="https://wa.me/916360250855" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.instagram.com/sonsofcauvery" target="_blank" rel="noopener" aria-label="Instagram"><svg class="icon" aria-hidden="true"><use href="icons.svg#instagram"></use></svg></a>
+                        <a href="https://www.youtube.com/@sonsofcauvery" target="_blank" rel="noopener" aria-label="YouTube"><svg class="icon" aria-hidden="true"><use href="icons.svg#youtube"></use></svg></a>
+                        <a href="https://wa.me/916360250855" target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="icon" aria-hidden="true"><use href="icons.svg#whatsapp"></use></svg></a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Sons of Cauvery. All rights reserved.</p>
+                <p>&copy; <span data-year>2026</span> Sons of Cauvery. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <script src="scripts.js"></script>
+    <a class="whatsapp-float" href="https://wa.me/916360250855" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><svg class="icon" aria-hidden="true"><use href="icons.svg#whatsapp"></use></svg></a>
 </body>
-</html> 
+</html>
