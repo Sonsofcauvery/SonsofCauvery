@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-10-26T16:03:54.330Z",
+ "updated": "2026-10-28T13:22:13.039Z",
  "banner": [
   "image-21",
   "image-32",
@@ -11,17 +11,16 @@
  ],
  "items": [
   {
-   "id": "image-1",
+   "id": "image-3",
    "type": "photo",
-   "title": "Fishing Adventure",
-   "w": 989,
-   "h": 1280,
+   "title": "Rain Forest Adventure",
+   "w": 4000,
+   "h": 2250,
    "widths": [
     480,
     960,
     1920
-   ],
-   "hidden": true
+   ]
   },
   {
    "id": "image-2",
@@ -45,18 +44,6 @@
    "widths": [
     480,
     960
-   ]
-  },
-  {
-   "id": "image-3",
-   "type": "photo",
-   "title": "Rain Forest Adventure",
-   "w": 4000,
-   "h": 2250,
-   "widths": [
-    480,
-    960,
-    1920
    ]
   },
   {
@@ -443,11 +430,11 @@
    ]
   },
   {
-   "id": "image-39",
+   "id": "image-40",
    "type": "photo",
-   "title": "Fishing Day",
-   "w": 2268,
-   "h": 4032,
+   "title": "River View",
+   "w": 1920,
+   "h": 1080,
    "widths": [
     480,
     960,
@@ -455,11 +442,11 @@
    ]
   },
   {
-   "id": "image-40",
+   "id": "image-39",
    "type": "photo",
-   "title": "River View",
-   "w": 1920,
-   "h": 1080,
+   "title": "Fishing Day",
+   "w": 2268,
+   "h": 4032,
    "widths": [
     480,
     960,
