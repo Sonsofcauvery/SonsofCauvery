@@ -1,14 +1,13 @@
 {
  "version": 1,
- "updated": "2026-10-28T14:07:01.876Z",
+ "updated": "2026-10-28T14:12:57.011Z",
  "banner": [
   "photo-20261028-cejs5",
   "photo-20261028-lbmjl",
-  "photo-20261028-oi2kq",
+  "photo-20261028-bg7za",
   "new-1-uncle-fotor-20250831213814",
-  "image-42-kishan",
   "photo-20261028-00kaq",
-  "photo-20261028-bg7za"
+  "image-42-kishan"
  ],
  "items": [
   {
@@ -116,6 +115,18 @@
    "title": ""
   },
   {
+   "id": "photo-20261028-yn2cv",
+   "type": "photo",
+   "w": 1080,
+   "h": 1908,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
+  },
+  {
    "id": "photo-20261028-hrtm8",
    "type": "photo",
    "w": 2160,
@@ -138,6 +149,30 @@
     960,
     1920
    ]
+  },
+  {
+   "id": "photo-20261028-b1kuz",
+   "type": "photo",
+   "w": 1200,
+   "h": 1600,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
+  },
+  {
+   "id": "photo-20261028-7egdx",
+   "type": "photo",
+   "w": 1200,
+   "h": 1600,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
   },
   {
    "id": "image-42-kishan",
