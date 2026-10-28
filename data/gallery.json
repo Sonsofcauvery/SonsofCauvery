@@ -1,20 +1,43 @@
 {
  "version": 1,
- "updated": "2026-10-28T13:51:04.039Z",
+ "updated": "2026-10-28T14:03:05.645Z",
  "banner": [
   "photo-20261028-cejs5",
+  "photo-20261028-00kaq",
   "new-1-uncle-fotor-20250831213814",
-  "image-10",
-  "image-21",
-  "image-22",
-  "image-42-kishan"
+  "image-42-kishan",
+  "image-11",
+  "photo-20261028-lbmjl",
+  "photo-20261028-rnyvr"
  ],
  "items": [
+  {
+   "id": "video-20261028-ylu3g",
+   "type": "video",
+   "w": 720,
+   "h": 1280,
+   "widths": [
+    960
+   ],
+   "title": ""
+  },
   {
    "id": "photo-20261028-bg7za",
    "type": "photo",
    "w": 3375,
    "h": 4219,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
+  },
+  {
+   "id": "photo-20261028-lbmjl",
+   "type": "photo",
+   "w": 2160,
+   "h": 3840,
    "widths": [
     480,
     960,
@@ -35,10 +58,10 @@
    ]
   },
   {
-   "id": "photo-20261028-hfq65",
+   "id": "photo-20261028-oi2kq",
    "type": "photo",
-   "w": 3214,
-   "h": 6276,
+   "w": 2160,
+   "h": 3840,
    "widths": [
     480,
     960,
@@ -47,12 +70,35 @@
    "title": ""
   },
   {
-   "id": "video-20261028-ylu3g",
+   "id": "video-20261028-old7k",
+   "type": "video",
+   "w": 960,
+   "h": 1280,
+   "widths": [
+    960
+   ],
+   "title": ""
+  },
+  {
+   "id": "video-20261028-03xq5",
    "type": "video",
    "w": 720,
    "h": 1280,
    "widths": [
     960
+   ],
+   "hidden": true,
+   "title": ""
+  },
+  {
+   "id": "photo-20261028-hfq65",
+   "type": "photo",
+   "w": 3214,
+   "h": 6276,
+   "widths": [
+    480,
+    960,
+    1920
    ],
    "title": ""
   },
@@ -67,6 +113,18 @@
     1920
    ],
    "hidden": true,
+   "title": ""
+  },
+  {
+   "id": "photo-20261028-hrtm8",
+   "type": "photo",
+   "w": 2160,
+   "h": 3840,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
    "title": ""
   },
   {
@@ -91,6 +149,54 @@
     480,
     960
    ]
+  },
+  {
+   "id": "photo-20261028-rnyvr",
+   "type": "photo",
+   "w": 2160,
+   "h": 3840,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
+  },
+  {
+   "id": "photo-20261028-00kaq",
+   "type": "photo",
+   "w": 1920,
+   "h": 1080,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
+  },
+  {
+   "id": "photo-20261028-ugssq",
+   "type": "photo",
+   "w": 2160,
+   "h": 3840,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
+  },
+  {
+   "id": "photo-20261028-bnn0s",
+   "type": "photo",
+   "w": 1440,
+   "h": 2558,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
   },
   {
    "id": "image-4",
