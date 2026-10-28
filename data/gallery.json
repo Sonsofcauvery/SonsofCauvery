@@ -1,16 +1,39 @@
 {
  "version": 1,
- "updated": "2026-10-28T13:49:35.126Z",
+ "updated": "2026-10-28T13:51:04.039Z",
  "banner": [
   "photo-20261028-cejs5",
-  "photo-20261028-bg7za",
   "new-1-uncle-fotor-20250831213814",
+  "image-10",
   "image-21",
   "image-22",
-  "image-42-kishan",
-  "image-14"
+  "image-42-kishan"
  ],
  "items": [
+  {
+   "id": "photo-20261028-bg7za",
+   "type": "photo",
+   "w": 3375,
+   "h": 4219,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
+  },
+  {
+   "id": "image-2",
+   "type": "photo",
+   "title": "Foreign Adventure",
+   "w": 3024,
+   "h": 4032,
+   "widths": [
+    480,
+    960,
+    1920
+   ]
+  },
   {
    "id": "photo-20261028-hfq65",
    "type": "photo",
@@ -34,18 +57,6 @@
    "title": ""
   },
   {
-   "id": "photo-20261028-bg7za",
-   "type": "photo",
-   "w": 3375,
-   "h": 4219,
-   "widths": [
-    480,
-    960,
-    1920
-   ],
-   "title": ""
-  },
-  {
    "id": "photo-20261028-cejs5",
    "type": "photo",
    "w": 1563,
@@ -64,18 +75,6 @@
    "title": "Rain Forest Adventure",
    "w": 4000,
    "h": 2250,
-   "widths": [
-    480,
-    960,
-    1920
-   ]
-  },
-  {
-   "id": "image-2",
-   "type": "photo",
-   "title": "Foreign Adventure",
-   "w": 3024,
-   "h": 4032,
    "widths": [
     480,
     960,
