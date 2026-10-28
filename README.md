@@ -14,7 +14,7 @@ Open **admin.html** on a phone or computer and enter the passcode. From there yo
 - **Add YouTube video**: paste a link. Use this for long videos.
 - Press **Publish changes**. The website updates in about 1 minute.
 
-Videos must be under 45 MB. iPhone videos recorded in HEVC may not play in every browser, so upload long or iPhone videos to YouTube and add the link.
+Photos and videos of any size can be added: photos are shrunk to web sizes, and videos are compressed in the browser to 720p MP4 (a 500 MB camera video usually ends up around 20-45 MB). Keep the page open while a video compresses. Videos longer than about 6 minutes should go on YouTube (use **Add YouTube video**). RAW camera files (.CR2, .NEF, .ARW, .DNG...) can't be opened by browsers: export them as JPG first.
 
 The first 8 gallery items also show in the "From Our Gallery" section on the home page.
 
@@ -45,6 +45,7 @@ icons.svg                 Icons (Font Awesome Free, CC BY 4.0)
 data/gallery.json         Gallery order, titles and banner list (edited by admin.html)
 media/                    Compressed photos (WebP, 480/960/1920 px wide) and videos
 vendor/Sortable.min.js    Drag-and-drop library used by the admin page
+vendor/mediabunny.min.mjs In-browser video compression for the admin page (MPL-2.0)
 ```
 
 Each photo is stored in three sizes so phones download small versions and big screens get sharp ones. Photos load only as you scroll to them.

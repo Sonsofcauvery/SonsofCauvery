@@ -267,7 +267,7 @@
                 <div class="toolbar">
                     <label class="btn accent" style="margin:0">
                         <svg class="icon"><use href="icons.svg#cloud-arrow-up"></use></svg> Add photos / videos
-                        <input type="file" id="file-input" accept="image/*,video/mp4,video/quicktime,video/webm" multiple hidden>
+                        <input type="file" id="file-input" accept="image/*,video/*" multiple hidden>
                     </label>
                     <button class="btn secondary" id="btn-youtube" type="button"><svg class="icon"><use href="icons.svg#youtube"></use></svg> Add YouTube video</button>
                 </div>
@@ -277,7 +277,7 @@
                     <button class="btn" type="submit">Add</button>
                 </form>
                 <div class="drop-hint" id="drop-zone">Or drop photos and videos here</div>
-                <p class="hint" style="margin-bottom:12px">Photos are resized and compressed automatically. Videos must be under 45 MB; for longer videos, upload to YouTube and add the link instead.</p>
+                <p class="hint" style="margin-bottom:12px">Photos and videos of any size are compressed automatically before uploading (keep this page open while a video compresses). Videos up to about 6 minutes can be added here; for longer ones, upload to YouTube and use "Add YouTube video".</p>
                 <div class="grid" id="grid"></div>
             </div>
         </section>

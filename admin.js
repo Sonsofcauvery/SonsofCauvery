@@ -15,7 +15,10 @@
     var GALLERY_PATH = 'data/gallery.json';
     var WIDTHS = [480, 960, 1920];
     var QUALITY = 0.8;
-    var MAX_VIDEO_MB = 45;
+    var MAX_VIDEO_MB = 45;          // compressed size limit per video (GitHub allows 100 MB per file)
+    var VIDEO_LONG_SIDE = 1280;     // 720p
+    var VIDEO_BITRATE = 2500000;    // bits/s for short clips; lowered for long ones to fit MAX_VIDEO_MB
+    var MIN_VIDEO_BITRATE = 700000; // below this quality drops too far: use YouTube instead
     var KDF_ITERATIONS = 600000;
     var SESSION_KEY = 'soc-admin-token';
 
@@ -424,6 +427,10 @@
                 badge.innerHTML = item.hidden ? icon('eye-slash') + ' hidden'
                     : icon(item.type === 'youtube' ? 'youtube' : 'video') + (item.type === 'youtube' ? ' YouTube' : ' video');
             }
+            if (item._label) {
+                badge.classList.remove('hidden');
+                badge.textContent = item._label;
+            }
             if (item._progress != null) {
                 var bar = node.querySelector('.progress');
                 bar.classList.remove('hidden');
@@ -531,7 +538,24 @@
 
     function decodeImage(file) {
         if (window.createImageBitmap) {
-            return createImageBitmap(file, { imageOrientation: 'from-image' }).catch(function () { return viaImg(); });
+            return createImageBitmap(file, { imageOrientation: 'from-image' }).then(function (bmp) {
+                // Very large photos (50+ megapixels) are shrunk once here so phones don't run out of memory
+                // while making the three web sizes.
+                var maxSide = 4096;
+                var big = Math.max(bmp.width, bmp.height);
+                if (big <= maxSide) return bmp;
+                var scale = maxSide / big;
+                var c = document.createElement('canvas');
+                c.width = Math.round(bmp.width * scale);
+                c.height = Math.round(bmp.height * scale);
+                var ctx = c.getContext('2d');
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(bmp, 0, 0, c.width, c.height);
+                c.naturalWidth = bmp.width;
+                c.naturalHeight = bmp.height;
+                bmp.close();
+                return c;
+            }).catch(function () { return viaImg(); });
         }
         return viaImg();
         function viaImg() {
@@ -648,20 +672,110 @@
         });
     }
 
-    function addVideo(file) {
-        if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
-            toast('"' + file.name + '" is ' + Math.round(file.size / 1048576) + ' MB. Videos must be under ' + MAX_VIDEO_MB + ' MB; upload long videos to YouTube and add the link instead.', 'error');
-            return Promise.resolve();
+    // Shows progress on one tile without re-rendering the grid (keeps typing in titles smooth).
+    function showProgress(item, fraction, label) {
+        item._progress = fraction;
+        item._label = label;
+        var tile = document.querySelector('#grid .tile[data-id="' + item.id + '"]');
+        if (!tile) return;
+        var bar = tile.querySelector('.progress');
+        bar.classList.remove('hidden');
+        bar.firstElementChild.style.width = Math.round(fraction * 100) + '%';
+        var badge = tile.querySelector('.badge');
+        badge.classList.remove('hidden');
+        badge.textContent = label;
+    }
+
+    var mediabunny = null;
+    function loadMediabunny() {
+        if (!mediabunny) mediabunny = import('./vendor/mediabunny.min.mjs');
+        return mediabunny;
+    }
+
+    // Shrinks any camera video (4K, HEVC, hundreds of MB) to a web-friendly 720p H.264 MP4
+    // in the browser, sized to fit under MAX_VIDEO_MB. Uses the device's hardware encoder (WebCodecs).
+    function compressVideo(file, onProgress) {
+        if (!window.VideoEncoder || !window.VideoDecoder) {
+            return Promise.reject(new Error('This browser can\'t compress videos. Please use Chrome or Edge on a computer or Android phone, or Safari on an up-to-date iPhone.'));
         }
-        var vext = /\.webm$/i.test(file.name) ? 'webm' : (/\.mov$/i.test(file.name) ? 'mov' : 'mp4');
-        var item = { id: newId('video'), type: 'video', title: titleFromName(file.name), _progress: 0.02 };
-        if (vext !== 'mp4') item.videoExt = vext;
+        return loadMediabunny().then(function (MB) {
+            var input = new MB.Input({ source: new MB.BlobSource(file), formats: MB.ALL_FORMATS });
+            return input.computeDuration().then(function (duration) {
+                duration = Math.max(duration || 1, 1);
+                var audioBits = 128000;
+                // Leave ~10% headroom for the MP4 container.
+                var budgetBits = MAX_VIDEO_MB * 1024 * 1024 * 8 * 0.9;
+                var videoBits = Math.min(VIDEO_BITRATE, Math.floor(budgetBits / duration - audioBits));
+                if (videoBits < MIN_VIDEO_BITRATE) {
+                    var maxMin = Math.floor(budgetBits / (MIN_VIDEO_BITRATE + audioBits) / 60);
+                    throw new Error('"' + file.name + '" is ' + Math.round(duration / 60) + ' minutes long. Videos up to about ' + maxMin + ' minutes can be added here; for longer videos, upload to YouTube and use "Add YouTube video".');
+                }
+                var output = new MB.Output({
+                    format: new MB.Mp4OutputFormat({ fastStart: 'in-memory' }),
+                    target: new MB.BufferTarget()
+                });
+                return MB.Conversion.init({
+                    input: input,
+                    output: output,
+                    tracks: 'primary',
+                    video: function (track) {
+                        var landscape = track.displayWidth >= track.displayHeight;
+                        var longSide = Math.max(track.displayWidth, track.displayHeight);
+                        var opts = { codec: 'avc', bitrate: videoBits, frameRate: 30, forceTranscode: true };
+                        if (longSide > VIDEO_LONG_SIDE) {
+                            if (landscape) opts.width = VIDEO_LONG_SIDE; else opts.height = VIDEO_LONG_SIDE;
+                        }
+                        return opts;
+                    },
+                    audio: function (track) {
+                        // Camera audio is usually AAC already: copy it as-is. Otherwise re-encode to whatever this browser can.
+                        if (track.codec === 'aac') return { codec: 'aac' };
+                        return MB.getFirstEncodableAudioCodec(['aac', 'opus']).then(function (codec) {
+                            return codec ? { codec: codec, bitrate: audioBits } : { discard: true };
+                        });
+                    }
+                }).then(function (conversion) {
+                    var videoKept = conversion.isValid && !conversion.discardedTracks.some(function (d) { return d.track.type === 'video'; });
+                    if (!videoKept) {
+                        throw new Error('"' + file.name + '" can\'t be compressed in this browser (its video format isn\'t supported here). Try Chrome or Edge on a computer, or upload it to YouTube and add the link.');
+                    }
+                    var lostAudio = conversion.discardedTracks.some(function (d) { return d.track.type === 'audio'; });
+                    conversion.onProgress = function (p) { onProgress(p); };
+                    return conversion.execute().then(function () {
+                        var blob = new Blob([output.target.buffer], { type: 'video/mp4' });
+                        blob.lostAudio = lostAudio;
+                        return blob;
+                    });
+                });
+            });
+        });
+    }
+
+    function keepScreenOn() {
+        try {
+            if (navigator.wakeLock) return navigator.wakeLock.request('screen').catch(function () { return null; });
+        } catch (e) { /* not supported */ }
+        return Promise.resolve(null);
+    }
+
+    function addVideo(file) {
+        var item = { id: newId('video'), type: 'video', title: titleFromName(file.name), _progress: 0.02, _label: 'preparing' };
         state.items.unshift(item);
         uploading++;
         setDirty();
         render();
-        var poster;
-        return videoPoster(file).then(function (p) {
+        var poster, mp4, lock;
+        return keepScreenOn().then(function (l) {
+            lock = l;
+            return compressVideo(file, function (p) {
+                showProgress(item, 0.02 + p * 0.68, 'compressing ' + Math.round(p * 100) + '%');
+            });
+        }).then(function (blob) {
+            mp4 = blob;
+            showProgress(item, 0.72, 'uploading');
+            // Poster comes from the compressed MP4, which every browser can play.
+            return videoPoster(mp4);
+        }).then(function (p) {
             poster = p;
             item.w = p.w; item.h = p.h;
             return makeSizes(p.video, p.w, p.h);
@@ -672,17 +786,22 @@
             if (first.ext !== 'webp') item.ext = first.ext;
             item._preview = URL.createObjectURL(first.blob);
             renderGrid();
-            return uploadSizes(item, [first], item.id + '-poster');
+            return blobToB64(first.blob).then(createBlob).then(function (sha) {
+                pendingBlobs['media/' + item.id + '-poster-' + first.width + '.' + first.ext] = sha;
+            });
         }).then(function () {
-            item._progress = 0.4;
-            renderGrid();
-            return blobToB64(file);
+            showProgress(item, 0.8, 'uploading ' + Math.round(mp4.size / 1048576) + ' MB');
+            return blobToB64(mp4);
         }).then(createBlob).then(function (sha) {
-            pendingBlobs['media/' + item.id + '.' + vext] = sha;
+            pendingBlobs['media/' + item.id + '.mp4'] = sha;
             delete item._progress;
+            delete item._label;
+            toast('"' + file.name + '" compressed from ' + Math.round(file.size / 1048576) + ' MB to ' + Math.max(1, Math.round(mp4.size / 1048576)) + ' MB' +
+                (mp4.lostAudio ? ', but this browser couldn\'t keep its sound. Try Chrome or Edge if you need the sound.' : '. Press Publish when you\'re ready.'), mp4.lostAudio ? 'error' : 'ok');
         }).catch(function (err) {
             failUpload(item, err);
         }).then(function () {
+            if (lock) lock.release().catch(function () {});
             uploading--;
             render();
         });
@@ -701,8 +820,12 @@
         // Process one at a time (newest ends up first) to keep phones from running out of memory.
         files.reverse().reduce(function (p, file) {
             return p.then(function () {
-                if (/^image\//.test(file.type) || /\.(jpe?g|png|webp|heic|heif|gif)$/i.test(file.name)) return addPhoto(file);
-                if (/^video\//.test(file.type) || /\.(mp4|mov|webm)$/i.test(file.name)) return addVideo(file);
+                if (/\.(cr2|cr3|nef|arw|raf|orf|rw2|dng|pef|srw)$/i.test(file.name)) {
+                    toast('"' + file.name + '" is a RAW camera file, which browsers can\'t open. Export it as JPG from your camera app or Lightroom first; any size is fine.', 'error');
+                    return;
+                }
+                if (/^image\//.test(file.type) || /\.(jpe?g|png|webp|heic|heif|gif|tiff?)$/i.test(file.name)) return addPhoto(file);
+                if (/^video\//.test(file.type) || /\.(mp4|m4v|mov|webm|mkv|mts|m2ts)$/i.test(file.name)) return addVideo(file);
                 toast('"' + file.name + '" is not a photo or video.', 'error');
             });
         }, Promise.resolve());
