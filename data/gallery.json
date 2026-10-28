@@ -1,15 +1,63 @@
 {
  "version": 1,
- "updated": "2026-10-28T13:22:13.039Z",
+ "updated": "2026-10-28T13:49:35.126Z",
  "banner": [
-  "image-21",
-  "image-32",
+  "photo-20261028-cejs5",
+  "photo-20261028-bg7za",
   "new-1-uncle-fotor-20250831213814",
+  "image-21",
   "image-22",
-  "image-28",
-  "image-15"
+  "image-42-kishan",
+  "image-14"
  ],
  "items": [
+  {
+   "id": "photo-20261028-hfq65",
+   "type": "photo",
+   "w": 3214,
+   "h": 6276,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
+  },
+  {
+   "id": "video-20261028-ylu3g",
+   "type": "video",
+   "w": 720,
+   "h": 1280,
+   "widths": [
+    960
+   ],
+   "title": ""
+  },
+  {
+   "id": "photo-20261028-bg7za",
+   "type": "photo",
+   "w": 3375,
+   "h": 4219,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "title": ""
+  },
+  {
+   "id": "photo-20261028-cejs5",
+   "type": "photo",
+   "w": 1563,
+   "h": 1563,
+   "widths": [
+    480,
+    960,
+    1920
+   ],
+   "hidden": true,
+   "title": ""
+  },
   {
    "id": "image-3",
    "type": "photo",
@@ -32,8 +80,7 @@
     480,
     960,
     1920
-   ],
-   "hidden": true
+   ]
   },
   {
    "id": "image-42-kishan",
@@ -457,7 +504,6 @@
    "id": "new-1-uncle-fotor-20250831213814",
    "type": "photo",
    "title": "Sons of Cauvery",
-   "hidden": true,
    "w": 912,
    "h": 962,
    "widths": [
