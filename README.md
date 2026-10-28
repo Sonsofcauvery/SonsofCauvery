@@ -31,6 +31,12 @@ The **Contact details** tab changes the phone number, WhatsApp number, email, In
 
 Press **Publish changes** and the site updates in about a minute. Editable spots are marked in the HTML with `data-edit`, `data-edit-img`, `data-edit-list` and `data-edit-item` attributes; new text added to the pages needs one of these to be editable from the admin page.
 
+## Version history and going back
+
+Every publish is saved. The **History** tab lists each one with its date, who published it and what changed (type a short note in the box next to **Publish changes** if you like; otherwise a summary is written automatically). Enter your name once in the History tab so each publish shows who made it.
+
+Press **Restore** on any version to put the gallery, photos/videos, page text and contact details back the way they were then. The restore is saved as a new version on top, so you can always undo it by restoring the version above it. The site's code and the admin key are not changed by a restore. Versions from before page editing was added only restore the photos and videos.
+
 ## One-time admin setup
 
 1. Push this folder to the `main` branch of `Sonsofcauvery/SonsofCauvery` (GitHub Pages keeps serving the same URL).

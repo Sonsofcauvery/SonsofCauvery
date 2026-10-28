@@ -184,6 +184,18 @@
         .frame-wrap iframe { width: 100%; height: 78vh; border: 0; background: #fff; border-radius: 4px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); transition: width 0.2s; }
         .frame-wrap.phone iframe { width: 390px; max-width: 100%; }
         .narrow-card { max-width: 620px; }
+        #publish-note { flex: 0 1 320px; min-width: 0; padding: 10px 12px; border: 1px solid #ccd5d3; border-radius: 6px; font: inherit; }
+        .name-row { max-width: 420px; margin: 6px 0 16px; }
+        .version { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid #e3ebe9; }
+        .version .v-main { min-width: 0; }
+        .version .v-title { font-weight: 600; color: var(--dark); overflow-wrap: anywhere; }
+        .version .v-details { margin: 2px 0 0; }
+        .version .v-details:empty { display: none; }
+        .version .v-meta { font-size: 0.85rem; color: #667; margin-top: 2px; }
+        .version .v-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .version .v-actions .btn { padding: 8px 14px; }
+        .version .v-link { font-size: 0.85rem; color: var(--primary); }
+        .v-live { background: var(--secondary); color: #fff; font-size: 0.8rem; font-weight: 700; padding: 4px 10px; border-radius: 99px; }
 
         @media (max-width: 600px) {
             .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -192,6 +204,13 @@
             header .links { gap: 10px; font-size: 0.85rem; }
             .publish-bar .btn { padding: 11px 14px; }
             .drop-hint { display: none; }
+            .publish-bar { flex-wrap: wrap; }
+            .publish-bar .status { flex: 1 1 100%; }
+            #publish-note { flex: 1 1 auto; }
+            .version { flex-direction: column; align-items: flex-start; }
+            .tabs { flex-wrap: wrap; }
+            .tab { padding: 9px 12px; }
+            body { padding-bottom: 150px; }
         }
     </style>
 </head>
@@ -276,6 +295,7 @@
                 <button type="button" class="tab active" data-tab="gallery">Photos &amp; videos</button>
                 <button type="button" class="tab" data-tab="pages">Edit pages</button>
                 <button type="button" class="tab" data-tab="contact">Contact details</button>
+                <button type="button" class="tab" data-tab="history">History</button>
             </nav>
 
             <div id="tab-gallery">
@@ -353,11 +373,27 @@
                     </form>
                 </div>
             </div>
+
+            <div id="tab-history" class="hidden">
+                <div class="card">
+                    <h2>Version history</h2>
+                    <p class="hint">Every publish is saved here. Press <b>Restore</b> to put the website back to how it was at that time. Restoring adds a new version on top, so nothing is ever lost and you can always go back again.</p>
+                    <div class="name-row">
+                        <label for="publisher-name">Your name (shown next to your publishes, saved on this device)</label>
+                        <input type="text" id="publisher-name" maxlength="40" placeholder="e.g. Yash">
+                    </div>
+                    <div id="history-list"></div>
+                    <div class="row" style="margin-top:14px">
+                        <button type="button" class="btn secondary hidden" id="history-more">Show older versions</button>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
     <div class="publish-bar hidden" id="publish-bar">
         <div class="status" id="publish-status">No changes</div>
+        <input type="text" id="publish-note" maxlength="120" placeholder="What did you change? (optional)" aria-label="What did you change? (optional)">
         <button class="btn" id="btn-publish" disabled>Publish changes</button>
     </div>
 

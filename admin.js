@@ -21,6 +21,7 @@
     var MIN_VIDEO_BITRATE = 700000; // below this quality drops too far: use YouTube instead
     var KDF_ITERATIONS = 600000;
     var SESSION_KEY = 'soc-admin-token';
+    var NAME_KEY = 'soc-admin-name';
 
     var $ = function (sel) { return document.querySelector(sel); };
     var enc = new TextEncoder();
@@ -35,6 +36,7 @@
     var pendingFiles = {};   // path -> new text content (edited pages)
     var uploading = 0;
     var dirty = false;
+    var loadedGallery = null; // { ids, json } as published, to describe what changed
 
     // ---------------------------------------------------------------- helpers
 
@@ -368,6 +370,8 @@
             pendingDeletes = {};
             pendingFiles = {};
             Pages.reset();
+            History.reset();
+            loadedGallery = galleryNow();
             dirty = false;
             render();
             show('#view-editor');
@@ -880,9 +884,10 @@
             var name = tab.dataset.tab;
             if (name !== 'pages') Pages.apply();
             document.querySelectorAll('.tabs .tab').forEach(function (t) { t.classList.toggle('active', t === tab); });
-            ['gallery', 'pages', 'contact'].forEach(function (n) { $('#tab-' + n).classList.toggle('hidden', n !== name); });
+            ['gallery', 'pages', 'contact', 'history'].forEach(function (n) { $('#tab-' + n).classList.toggle('hidden', n !== name); });
             if (name === 'pages') Pages.open();
             if (name === 'contact') Pages.openContact();
+            if (name === 'history') History.open();
         });
     });
 
@@ -909,6 +914,7 @@
         var frameReady = false;
         var frameDirty = false;
         var imgChanges = {};   // data-edit-img key -> new attributes
+        var edits = { pages: {}, footer: false, contact: false }; // what changed, for the history note
         var frame = $('#page-frame');
         var select = $('#page-select');
 
@@ -935,7 +941,10 @@
             frameReady = false;
             frameDirty = false;
             imgChanges = {};
+            clearEdits();
         }
+
+        function clearEdits() { edits = { pages: {}, footer: false, contact: false }; }
 
         function parse(html) {
             return new DOMParser().parseFromString(html, 'text/html');
@@ -1175,7 +1184,7 @@
             }
 
             var out = serialize(doc);
-            if (out !== serialize(parse(src[current]))) store(current, out);
+            if (out !== serialize(parse(src[current]))) { store(current, out); edits.pages[current] = true; }
 
             // Footer is shared: copy footer edits to the other pages.
             var footer = {};
@@ -1189,7 +1198,7 @@
                     var k = el.getAttribute('data-edit');
                     if (k in footer && textOf(el) !== footer[k]) { el.textContent = footer[k]; changed = true; }
                 });
-                if (changed) store(path, serialize(d));
+                if (changed) { store(path, serialize(d)); edits.footer = true; }
             });
             frameDirty = false;
         }
@@ -1203,8 +1212,9 @@
 
         var contact = null;
 
-        function detectContact() {
-            var html = src['index.html'] || '';
+        function detectContact() { return contactOf(src['index.html'] || ''); }
+
+        function contactOf(html) {
             var tel = (html.match(/href="tel:\+?(\d+)"/) || [])[1] || '';
             var phoneText = (html.match(/href="tel:[^"]*"[^>]*>([^<]+)</) || [])[1] || '';
             var wa = (html.match(/wa\.me\/(\d+)/) || [])[1] || '';
@@ -1231,6 +1241,22 @@
             return text.split(from).join(to);
         }
 
+        function swapContact(t, from, to) {
+            t = replaceAll(t, 'tel:+' + from.tel, 'tel:+' + to.tel);
+            t = replaceAll(t, 'tel:' + from.tel, 'tel:+' + to.tel);
+            t = replaceAll(t, from.phoneText, to.phoneText);
+            t = replaceAll(t, 'wa.me/' + from.wa, 'wa.me/' + to.wa);
+            t = replaceAll(t, from.email, to.email);
+            if (to.insta) t = replaceAll(t, from.insta, to.insta);
+            if (to.yt) t = replaceAll(t, from.yt, to.yt);
+            return t;
+        }
+
+        function label(path) {
+            var p = PAGES.filter(function (x) { return x[0] === path; })[0];
+            return p ? p[1] : path;
+        }
+
         $('#form-contact').addEventListener('submit', function (e) {
             e.preventDefault();
             if (!contact) return;
@@ -1245,24 +1271,215 @@
             apply();
             var files = PAGES.map(function (p) { return p[0]; }).concat(EXTRA_FILES);
             var changed = 0;
+            var next = { tel: tel, phoneText: phoneText, wa: wa, email: email, insta: insta || contact.insta, yt: yt || contact.yt };
             files.forEach(function (path) {
                 if (!src[path]) return;
-                var t = src[path];
-                t = replaceAll(t, 'tel:+' + contact.tel, 'tel:+' + tel);
-                t = replaceAll(t, 'tel:' + contact.tel, 'tel:+' + tel);
-                t = replaceAll(t, contact.phoneText, phoneText);
-                t = replaceAll(t, 'wa.me/' + contact.wa, 'wa.me/' + wa);
-                t = replaceAll(t, contact.email, email);
-                if (insta) t = replaceAll(t, contact.insta, insta);
-                if (yt) t = replaceAll(t, contact.yt, yt);
+                var t = swapContact(src[path], contact, next);
                 if (t !== src[path]) { store(path, t); changed++; }
             });
+            if (changed) edits.contact = true;
             contact = detectContact();
             if (current) { var keep = current; current = null; showPage(keep); }
             toast(changed ? 'Contact details updated on ' + changed + ' files. Press Publish to put them live.' : 'Nothing changed.', changed ? 'ok' : 'info');
         });
 
-        return { open: open, apply: apply, reset: reset, openContact: openContact };
+        return {
+            open: open, apply: apply, reset: reset, openContact: openContact,
+            paths: PAGES.map(function (p) { return p[0]; }), label: label,
+            edits: function () { return edits; }, clearEdits: clearEdits,
+            contactOf: contactOf, swapContact: swapContact
+        };
+    })();
+
+    // ---------------------------------------------------------------- history / restore
+    //
+    // Every publish is a git commit, so the history is the branch's commit list. "Restore" makes a
+    // NEW commit that puts back the gallery, photos/videos, page text and contact details as they
+    // were in an older version. The site's code (admin page, scripts, styles) and the admin key stay
+    // as they are now, and the restore itself shows up in the history, so it can be undone too.
+
+    var History = (function () {
+        var PER_PAGE = 20;
+        var list = $('#history-list');
+        var more = $('#history-more');
+        var page = 0;
+        var loaded = false;
+        var busy = false;
+        var nameInput = $('#publisher-name');
+
+        nameInput.value = publisher();
+        nameInput.addEventListener('input', function () {
+            try { localStorage.setItem(NAME_KEY, nameInput.value.trim()); } catch (e) { /* private mode */ }
+        });
+
+        function reset() {
+            loaded = false;
+            page = 0;
+            list.innerHTML = '';
+        }
+
+        function open() {
+            if (!loaded) { loaded = true; loadMore(); }
+        }
+
+        function when(iso) {
+            return new Date(iso).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+        }
+
+        // Split a commit message into what to show: title, details, who published it.
+        function describe(message) {
+            var lines = message.split('\n');
+            var who = '';
+            var admin = /\(admin page\)\s*$/.test(message) || /^(Update gallery|Update website) from admin page/.test(message);
+            var body = lines.slice(1).filter(function (l) {
+                var m = l.match(/^Published by: (.+)$/);
+                if (m) { who = m[1]; return false; }
+                return l.trim() && l.trim() !== '(admin page)' && !/^(Co-Authored-By|Claude-Session):/i.test(l);
+            });
+            var title = lines[0];
+            if (/^Update gallery from admin page$/.test(title)) title = 'Gallery update';
+            if (/^Update website from admin page$/.test(title)) title = 'Website update';
+            return { title: title, details: admin ? body.join(' ') : '', who: who, admin: admin };
+        }
+
+        function loadMore() {
+            page++;
+            more.disabled = true;
+            more.textContent = 'Loading...';
+            gh(repoPath() + '/commits?sha=' + encodeURIComponent(config.branch) + '&per_page=' + PER_PAGE + '&page=' + page).then(function (commits) {
+                commits.forEach(function (c, i) { list.appendChild(row(c, page === 1 && i === 0)); });
+                more.classList.toggle('hidden', commits.length < PER_PAGE);
+                if (page === 1 && !commits.length) list.innerHTML = '<p class="hint">No versions yet.</p>';
+            }).catch(function (err) {
+                page--;
+                toast(friendlyError(err), 'error');
+            }).then(function () {
+                more.disabled = false;
+                more.textContent = 'Show older versions';
+            });
+        }
+
+        function row(c, live) {
+            var d = describe(c.commit.message);
+            var el = document.createElement('div');
+            el.className = 'version';
+            el.innerHTML =
+                '<div class="v-main"><div class="v-title"></div><div class="v-details hint"></div>' +
+                '<div class="v-meta"></div></div>' +
+                '<div class="v-actions"><a class="v-link" target="_blank" rel="noopener">See changes</a></div>';
+            el.querySelector('.v-title').textContent = d.title;
+            el.querySelector('.v-details').textContent = d.details;
+            el.querySelector('.v-meta').textContent = when(c.commit.author.date) +
+                (d.who ? ' · by ' + d.who : (d.admin ? '' : ' · website code update'));
+            el.querySelector('.v-link').href = c.html_url;
+            var actions = el.querySelector('.v-actions');
+            if (live) {
+                var tag = document.createElement('span');
+                tag.className = 'v-live';
+                tag.textContent = 'Live now';
+                actions.insertBefore(tag, actions.firstChild);
+            } else {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'btn secondary';
+                b.textContent = 'Restore';
+                b.addEventListener('click', function () { restore(c, d, b); });
+                actions.insertBefore(b, actions.firstChild);
+            }
+            return el;
+        }
+
+        function treeMap(commitSha) {
+            return gh(repoPath() + '/git/commits/' + commitSha).then(function (commit) {
+                return gh(repoPath() + '/git/trees/' + commit.tree.sha + '?recursive=1').then(function (t) {
+                    var map = {};
+                    (t.tree || []).forEach(function (e) { if (e.type === 'blob') map[e.path] = e; });
+                    return { treeSha: commit.tree.sha, files: map };
+                });
+            });
+        }
+
+        function blobText(sha) {
+            return gh(repoPath() + '/git/blobs/' + sha).then(function (b) { return dec.decode(bytesFromB64(b.content.replace(/\s/g, ''))); });
+        }
+
+        function restore(c, d, btn) {
+            if (busy) return;
+            var date = when(c.commit.author.date);
+            var ask = 'Put the website back to how it was on ' + date + '?\n\n' +
+                'Photos, videos, gallery order, page text and contact details will go back to that version. ' +
+                'This is saved as a new version, so you can undo it from this list.';
+            if (dirty) ask += '\n\nYour unpublished changes on this page will be lost.';
+            if (!confirm(ask)) return;
+            busy = true;
+            btn.disabled = true;
+            btn.textContent = 'Restoring...';
+            var head, now, old, pagesOk = true;
+            getHead().then(function (h) {
+                head = h;
+                return Promise.all([treeMap(head), treeMap(c.sha)]);
+            }).then(function (r) {
+                now = r[0];
+                old = r[1];
+                if (!old.files[GALLERY_PATH]) throw new Error('This version is from before the new website, so it can\'t be restored here.');
+                // Page text can only go back to versions made after page editing was added,
+                // otherwise the pages would lose their editable markers.
+                var idx = old.files['index.html'];
+                return idx ? blobText(idx.sha).then(function (t) { pagesOk = t.indexOf('data-edit') !== -1; return t; }) : (pagesOk = false);
+            }).then(function (oldIndex) {
+                var restorable = function (path) {
+                    return path === GALLERY_PATH || /^media\//.test(path) || (pagesOk && Pages.paths.indexOf(path) !== -1);
+                };
+                var tree = [];
+                Object.keys(old.files).forEach(function (path) {
+                    var e = old.files[path];
+                    if (restorable(path) && (!now.files[path] || now.files[path].sha !== e.sha)) {
+                        tree.push({ path: path, mode: e.mode, type: 'blob', sha: e.sha });
+                    }
+                });
+                Object.keys(now.files).forEach(function (path) {
+                    if (restorable(path) && !old.files[path]) tree.push({ path: path, mode: '100644', type: 'blob', sha: null });
+                });
+                // Contact details also live in scripts.js (booking form -> WhatsApp).
+                var js = now.files['scripts.js'];
+                var contactStep = (!pagesOk || !js || !now.files['index.html']) ? Promise.resolve() :
+                    Promise.all([blobText(now.files['index.html'].sha), blobText(js.sha)]).then(function (t) {
+                        var from = Pages.contactOf(t[0]);
+                        var to = Pages.contactOf(oldIndex);
+                        if (!to.tel || !to.wa || !to.email) return;
+                        var next = Pages.swapContact(t[1], from, to);
+                        if (next !== t[1]) tree.push({ path: 'scripts.js', mode: '100644', type: 'blob', content: next });
+                    });
+                return contactStep.then(function () { return tree; });
+            }).then(function (tree) {
+                if (!tree.length) throw new Error('That version looks the same as the live website, so there was nothing to restore.');
+                return gh(repoPath() + '/git/trees', { method: 'POST', body: { base_tree: now.treeSha, tree: tree } });
+            }).then(function (t) {
+                var msg = 'Restore version from ' + date + ' (' + d.title + ')';
+                var who = publisher();
+                if (who) msg += '\n\nPublished by: ' + who;
+                return gh(repoPath() + '/git/commits', { method: 'POST', body: { message: msg + '\n\n(admin page)', tree: t.sha, parents: [head] } });
+            }).then(function (commit) {
+                return gh(repoPath() + '/git/refs/heads/' + encodeURIComponent(config.branch), { method: 'PATCH', body: { sha: commit.sha, force: false } });
+            }).then(function () {
+                dirty = false;
+                return openEditor();
+            }).then(function () {
+                reset();
+                open();
+                toast(pagesOk
+                    ? 'Restored. The website will show that version in about 1 minute.'
+                    : 'Photos and videos restored. Page text was kept as it is now, because that version is older than page editing. The website updates in about 1 minute.', 'ok');
+            }).catch(function (err) {
+                btn.disabled = false;
+                btn.textContent = 'Restore';
+                toast(friendlyError(err), 'error');
+            }).then(function () { busy = false; });
+        }
+
+        more.addEventListener('click', loadMore);
+
+        return { open: open, reset: reset };
     })();
 
     // ---------------------------------------------------------------- publish
@@ -1306,13 +1523,57 @@
         });
     }
 
+    function galleryNow() {
+        return {
+            ids: state.items.map(function (it) { return it.id; }),
+            json: JSON.stringify({ banner: state.banner, items: cleanItems() })
+        };
+    }
+
+    // "Added 2 photos/videos, changed the order. Edited pages: Home, Contact."
+    function changeSummary() {
+        var parts = [];
+        var now = galleryNow();
+        var was = loadedGallery || { ids: [], json: '' };
+        var added = now.ids.filter(function (id) { return was.ids.indexOf(id) === -1; }).length;
+        var removed = was.ids.filter(function (id) { return now.ids.indexOf(id) === -1; }).length;
+        if (added) parts.push('added ' + added + ' photo' + (added > 1 ? 's/videos' : '/video'));
+        if (removed) parts.push('removed ' + removed);
+        var keptNow = now.ids.filter(function (id) { return was.ids.indexOf(id) !== -1; });
+        var keptWas = was.ids.filter(function (id) { return now.ids.indexOf(id) !== -1; });
+        if (keptNow.join() !== keptWas.join()) parts.push('changed the order');
+        else if (!added && !removed && now.json !== was.json) parts.push('changed gallery titles or banner');
+        var text = parts.length ? 'Gallery: ' + parts.join(', ') + '.' : '';
+        var e = Pages.edits();
+        var pages = Object.keys(e.pages).map(Pages.label);
+        var more = [];
+        if (pages.length) more.push('edited ' + pages.join(', ') + ' page' + (pages.length > 1 ? 's' : ''));
+        if (e.footer) more.push('edited the footer');
+        if (e.contact) more.push('changed contact details');
+        if (more.length) text += (text ? ' ' : '') + 'Pages: ' + more.join(', ') + '.';
+        return text || 'Website update.';
+    }
+
+    function publisher() {
+        try { return (localStorage.getItem(NAME_KEY) || '').trim(); } catch (e) { return ''; }
+    }
+
+    function commitMessage(first) {
+        var note = $('#publish-note').value.trim();
+        var msg = first || (note ? note : changeSummary());
+        if (!first && note) msg += '\n\n' + changeSummary();
+        var who = publisher();
+        if (who) msg += '\n\nPublished by: ' + who;
+        return msg + '\n\n(admin page)';
+    }
+
     function commitOnto(headSha) {
         return gh(repoPath() + '/git/commits/' + headSha).then(function (commit) {
             return buildTree(commit.tree.sha, headSha);
         }).then(function (tree) {
             return gh(repoPath() + '/git/commits', {
                 method: 'POST',
-                body: { message: Object.keys(pendingFiles).length ? 'Update website from admin page' : 'Update gallery from admin page', tree: tree.sha, parents: [headSha] }
+                body: { message: commitMessage(), tree: tree.sha, parents: [headSha] }
             });
         }).then(function (commit) {
             return gh(repoPath() + '/git/refs/heads/' + encodeURIComponent(config.branch), {
@@ -1327,7 +1588,7 @@
         btn.disabled = true;
         $('#publish-status').innerHTML = '<strong>Publishing...</strong>';
         getHead().then(function (head) {
-            if (head === baseCommit) return commitOnto(head);
+            if (head === baseCommit) return head;
             var edited = Object.keys(pendingFiles);
             if (!edited.length) return head;
             // Page edits replace whole files, so make sure nobody changed those files in the meantime.
@@ -1354,6 +1615,10 @@
             pendingBlobs = {};
             pendingDeletes = {};
             pendingFiles = {};
+            loadedGallery = galleryNow();
+            Pages.clearEdits();
+            $('#publish-note').value = '';
+            History.reset();
             dirty = false;
             updatePublishBar();
             toast('Published! The website will show the changes in about 1 minute.', 'ok');
