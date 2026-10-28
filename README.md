@@ -18,6 +18,19 @@ Photos and videos of any size can be added: photos are shrunk to web sizes, and 
 
 The first 8 gallery items also show in the "From Our Gallery" section on the home page.
 
+## Editing text, pictures and contact details
+
+In admin.html, the **Edit pages** tab shows each page exactly as visitors see it:
+
+- Click any text with a yellow dotted outline and type. Footer changes apply to every page.
+- Click the home page photo to replace it.
+- Testimonials, "What We Offer" cards and terms/cancellation sections have **+ Copy** and **Remove** buttons.
+- "Page title & Google description" sets what shows in the browser tab, on Google and in WhatsApp link previews.
+
+The **Contact details** tab changes the phone number, WhatsApp number, email, Instagram and YouTube links everywhere at once (including the booking form and WhatsApp button).
+
+Press **Publish changes** and the site updates in about a minute. Editable spots are marked in the HTML with `data-edit`, `data-edit-img`, `data-edit-list` and `data-edit-item` attributes; new text added to the pages needs one of these to be editable from the admin page.
+
 ## One-time admin setup
 
 1. Push this folder to the `main` branch of `Sonsofcauvery/SonsofCauvery` (GitHub Pages keeps serving the same URL).

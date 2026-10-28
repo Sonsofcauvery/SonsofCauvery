@@ -32,6 +32,7 @@
     var baseCommit = null;   // commit sha the edit started from
     var pendingBlobs = {};   // path -> blob sha, uploaded but not yet committed
     var pendingDeletes = {}; // path -> true
+    var pendingFiles = {};   // path -> new text content (edited pages)
     var uploading = 0;
     var dirty = false;
 
@@ -365,6 +366,8 @@
             state = { items: data.items || [], banner: data.banner || [] };
             pendingBlobs = {};
             pendingDeletes = {};
+            pendingFiles = {};
+            Pages.reset();
             dirty = false;
             render();
             show('#view-editor');
@@ -870,6 +873,398 @@
         render();
     });
 
+    // ---------------------------------------------------------------- tabs
+
+    document.querySelectorAll('.tabs .tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            var name = tab.dataset.tab;
+            if (name !== 'pages') Pages.apply();
+            document.querySelectorAll('.tabs .tab').forEach(function (t) { t.classList.toggle('active', t === tab); });
+            ['gallery', 'pages', 'contact'].forEach(function (n) { $('#tab-' + n).classList.toggle('hidden', n !== name); });
+            if (name === 'pages') Pages.open();
+            if (name === 'contact') Pages.openContact();
+        });
+    });
+
+    // ---------------------------------------------------------------- page text editor
+    //
+    // Pages are edited in place: the real page is shown in an iframe, elements marked with
+    // data-edit (plain text), data-edit-img (a photo) and data-edit-list/-item (repeatable cards)
+    // become editable, and on publish the edits are written back into the page's HTML file.
+    // Keys starting with "footer-" are shared by every page, so footer edits apply site-wide.
+
+    var Pages = (function () {
+        var PAGES = [
+            ['index.html', 'Home'],
+            ['gallery.html', 'Gallery'],
+            ['contact.html', 'Contact'],
+            ['terms.html', 'Terms & Conditions'],
+            ['cancellation-policy.html', 'Trip Cancellation Policy'],
+            ['404.html', '"Page not found" page']
+        ];
+        var EXTRA_FILES = ['scripts.js'];
+        var src = {};          // path -> latest HTML/JS text, including edits not yet published
+        var loading = null;
+        var current = null;
+        var frameReady = false;
+        var frameDirty = false;
+        var imgChanges = {};   // data-edit-img key -> new attributes
+        var frame = $('#page-frame');
+        var select = $('#page-select');
+
+        PAGES.forEach(function (p) {
+            var o = document.createElement('option');
+            o.value = p[0];
+            o.textContent = p[1];
+            select.appendChild(o);
+        });
+
+        function load() {
+            if (!loading) {
+                loading = Promise.all(PAGES.map(function (p) { return p[0]; }).concat(EXTRA_FILES).map(function (path) {
+                    return readRepoFile(path, baseCommit).then(function (f) { src[path] = f.text; }, function () { /* missing page */ });
+                }));
+            }
+            return loading;
+        }
+
+        function reset() {
+            loading = null;
+            src = {};
+            current = null;
+            frameReady = false;
+            frameDirty = false;
+            imgChanges = {};
+        }
+
+        function parse(html) {
+            return new DOMParser().parseFromString(html, 'text/html');
+        }
+
+        function serialize(doc) {
+            return '<!DOCTYPE html>\n' + doc.documentElement.outerHTML + '\n';
+        }
+
+        function store(path, text) {
+            if (src[path] === text) return;
+            src[path] = text;
+            pendingFiles[path] = text;
+            setDirty();
+        }
+
+        function open() {
+            show('#view-editor');
+            if (current) return;
+            frame.srcdoc = '<p style="font-family:sans-serif;padding:20px">Loading pages...</p>';
+            load().then(function () { showPage(select.value || 'index.html'); });
+        }
+
+        function showPage(path) {
+            apply();
+            if (!src[path]) {
+                toast('Could not load ' + path + '.', 'error');
+                return;
+            }
+            current = path;
+            select.value = path;
+            frameReady = false;
+            imgChanges = {};
+            frame.onload = setupFrame;
+            frame.srcdoc = src[path];
+            var doc = parse(src[path]);
+            $('#meta-title').value = doc.title;
+            var desc = doc.querySelector('meta[name="description"]');
+            $('#meta-desc').value = desc ? desc.getAttribute('content') : '';
+        }
+
+        select.addEventListener('change', function () { showPage(select.value); });
+
+        document.querySelectorAll('.seg-btn').forEach(function (b) {
+            b.addEventListener('click', function () {
+                document.querySelectorAll('.seg-btn').forEach(function (x) { x.classList.toggle('active', x === b); });
+                $('#frame-wrap').classList.toggle('phone', b.dataset.view === 'phone');
+            });
+        });
+
+        ['#meta-title', '#meta-desc'].forEach(function (id) {
+            $(id).addEventListener('input', function () { frameDirty = true; setDirty(); });
+        });
+
+        var EDIT_CSS =
+            '[data-edit]{outline:1px dashed rgba(242,183,5,.9);outline-offset:2px;cursor:text;min-width:1em;display:inline-block}' +
+            'p[data-edit],h1[data-edit],h2[data-edit],h3[data-edit],h4[data-edit],li[data-edit]{display:block}' +
+            'li[data-edit]{display:list-item}' +
+            '[data-edit]:hover{background:rgba(242,183,5,.12)}' +
+            '[data-edit]:focus{outline:2px solid #f2b705;background:rgba(242,183,5,.18)}' +
+            'img[data-edit-img]{outline:3px dashed #f2b705;outline-offset:-3px;cursor:pointer}' +
+            '[data-edit-item]{position:relative}' +
+            '.soc-ctl{position:absolute;top:6px;right:6px;display:flex;gap:6px;z-index:5}' +
+            '.soc-ctl button{font:600 12px/1 "Segoe UI",sans-serif;padding:6px 9px;border-radius:5px;border:0;cursor:pointer;background:#2b3a42;color:#fff}' +
+            '.soc-ctl button.rm{background:#c0392b}' +
+            '.soc-img-tip{position:absolute;left:10px;top:10px;background:#f2b705;color:#2b3a42;font:600 12px "Segoe UI",sans-serif;padding:4px 8px;border-radius:5px;pointer-events:none}';
+
+        function makeEditable(doc, root) {
+            root.querySelectorAll('[data-edit]').forEach(function (el) {
+                el.setAttribute('contenteditable', 'plaintext-only');
+                if (el.contentEditable !== 'plaintext-only') el.setAttribute('contenteditable', 'true');
+                el.setAttribute('spellcheck', 'true');
+            });
+            root.querySelectorAll('[data-edit-item]').forEach(function (item) { addControls(doc, item); });
+        }
+
+        function addControls(doc, item) {
+            if (item.querySelector(':scope > .soc-ctl')) return;
+            var ctl = doc.createElement('div');
+            ctl.className = 'soc-ctl';
+            ctl.innerHTML = '<button type="button" class="cp">+ Copy</button><button type="button" class="rm">Remove</button>';
+            ctl.querySelector('.cp').addEventListener('click', function () {
+                var clone = item.cloneNode(true);
+                var c = clone.querySelector(':scope > .soc-ctl');
+                if (c) c.remove();
+                clone.querySelectorAll('[data-edit]').forEach(function (el) {
+                    el.setAttribute('data-edit', current.replace(/\.html$/, '') + '-n' + Math.random().toString(36).slice(2, 8));
+                });
+                item.after(clone);
+                makeEditable(doc, clone);
+                addControls(doc, clone);
+                var first = clone.querySelector('[data-edit]');
+                if (first) first.focus();
+                frameDirty = true;
+                setDirty();
+            });
+            ctl.querySelector('.rm').addEventListener('click', function () {
+                var list = item.parentNode;
+                if (list.querySelectorAll(':scope > [data-edit-item]').length <= 1 &&
+                    !confirm('This is the last one in this section. Remove it anyway?')) return;
+                if (!confirm('Remove this card?')) return;
+                item.remove();
+                frameDirty = true;
+                setDirty();
+            });
+            item.appendChild(ctl);
+        }
+
+        function setupFrame() {
+            var doc = frame.contentDocument;
+            if (!doc || !doc.body || !current) return;
+            var style = doc.createElement('style');
+            style.textContent = EDIT_CSS;
+            doc.head.appendChild(style);
+            makeEditable(doc, doc);
+
+            doc.addEventListener('input', function () { frameDirty = true; setDirty(); });
+            doc.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && e.target.closest && e.target.closest('[data-edit]')) e.preventDefault();
+            });
+            doc.addEventListener('paste', function (e) {
+                var el = e.target.closest && e.target.closest('[data-edit]');
+                if (!el || el.getAttribute('contenteditable') === 'plaintext-only') return;
+                e.preventDefault();
+                var text = (e.clipboardData || window.clipboardData).getData('text/plain').replace(/\s+/g, ' ');
+                doc.execCommand('insertText', false, text);
+            });
+            // Links and buttons shouldn't navigate or submit while editing.
+            doc.addEventListener('click', function (e) {
+                if (e.target.closest('.soc-ctl')) return;
+                var img = e.target.closest('img[data-edit-img]');
+                if (img) { e.preventDefault(); pickImage(img); return; }
+                if (e.target.closest('a, button, .gallery-item')) { e.preventDefault(); e.stopPropagation(); }
+            }, true);
+            doc.addEventListener('submit', function (e) { e.preventDefault(); }, true);
+            frameReady = true;
+        }
+
+        var imgTarget = null;
+        function pickImage(img) {
+            imgTarget = img;
+            $('#img-input').click();
+        }
+
+        $('#img-input').addEventListener('change', function (e) {
+            var file = e.target.files[0];
+            e.target.value = '';
+            if (!file || !imgTarget) return;
+            var img = imgTarget;
+            var key = img.getAttribute('data-edit-img');
+            var id = newId('page');
+            toast('Preparing photo...', 'info');
+            uploading++;
+            updatePublishBar();
+            decodeImage(file).then(function (s) {
+                var w = s.naturalWidth || s.width, h = s.naturalHeight || s.height;
+                return makeSizes(s, w, h).then(function (sizes) { return { sizes: sizes, w: w, h: h }; });
+            }).then(function (r) {
+                return r.sizes.reduce(function (p, s) {
+                    return p.then(function () {
+                        return blobToB64(s.blob).then(createBlob).then(function (sha) {
+                            pendingBlobs['media/' + id + '-' + s.width + '.' + s.ext] = sha;
+                        });
+                    });
+                }, Promise.resolve()).then(function () { return r; });
+            }).then(function (r) {
+                var ext = r.sizes[0].ext;
+                var mid = r.sizes.filter(function (s) { return s.width === 960; })[0] || r.sizes[r.sizes.length - 1];
+                var attrs = {
+                    src: 'media/' + id + '-' + mid.width + '.' + ext,
+                    srcset: r.sizes.map(function (s) { return 'media/' + id + '-' + s.width + '.' + ext + ' ' + Math.min(s.width, r.w) + 'w'; }).join(', '),
+                    width: String(Math.min(mid.width, r.w)),
+                    height: String(Math.round(r.h * Math.min(mid.width, r.w) / r.w))
+                };
+                imgChanges[key] = attrs;
+                // Preview with the local file (the uploaded copies aren't on the site yet).
+                img.removeAttribute('srcset');
+                img.src = URL.createObjectURL(mid.blob);
+                frameDirty = true;
+                setDirty();
+                toast('Photo replaced. Press Publish when you\'re ready.', 'ok');
+            }).catch(function (err) {
+                toast(friendlyError(err), 'error');
+            }).then(function () {
+                uploading--;
+                updatePublishBar();
+            });
+        });
+
+        function cleanList(node) {
+            var copy = node.cloneNode(true);
+            copy.querySelectorAll('.soc-ctl').forEach(function (c) { c.remove(); });
+            copy.querySelectorAll('[contenteditable]').forEach(function (el) {
+                el.removeAttribute('contenteditable');
+                el.removeAttribute('spellcheck');
+            });
+            return copy.innerHTML;
+        }
+
+        function textOf(el) {
+            return el.textContent.replace(/\s+/g, ' ').trim();
+        }
+
+        // Writes the edits made in the iframe back into the page's HTML (and footer edits into every page).
+        function apply() {
+            if (!current || !frameReady || !frameDirty) return;
+            var fdoc = frame.contentDocument;
+            var doc = parse(src[current]);
+            var texts = {};
+            fdoc.querySelectorAll('[data-edit]').forEach(function (el) { texts[el.getAttribute('data-edit')] = textOf(el); });
+
+            var fLists = fdoc.querySelectorAll('[data-edit-list]');
+            doc.querySelectorAll('[data-edit-list]').forEach(function (list, i) {
+                if (fLists[i]) list.innerHTML = cleanList(fLists[i]);
+            });
+            doc.querySelectorAll('[data-edit]').forEach(function (el) {
+                var k = el.getAttribute('data-edit');
+                if (k in texts && textOf(el) !== texts[k]) el.textContent = texts[k];
+            });
+            Object.keys(imgChanges).forEach(function (key) {
+                var img = doc.querySelector('img[data-edit-img="' + key + '"]');
+                if (!img) return;
+                Object.keys(imgChanges[key]).forEach(function (a) { img.setAttribute(a, imgChanges[key][a]); });
+            });
+            imgChanges = {};
+
+            var title = $('#meta-title').value.trim();
+            var desc = $('#meta-desc').value.trim();
+            if (title && title !== doc.title) {
+                doc.title = title;
+                setMeta(doc, 'property', 'og:title', title);
+            }
+            var dm = doc.querySelector('meta[name="description"]');
+            if (dm && desc && dm.getAttribute('content') !== desc) {
+                dm.setAttribute('content', desc);
+                setMeta(doc, 'property', 'og:description', desc);
+            }
+
+            var out = serialize(doc);
+            if (out !== serialize(parse(src[current]))) store(current, out);
+
+            // Footer is shared: copy footer edits to the other pages.
+            var footer = {};
+            Object.keys(texts).forEach(function (k) { if (/^footer-/.test(k)) footer[k] = texts[k]; });
+            PAGES.forEach(function (p) {
+                var path = p[0];
+                if (path === current || !src[path]) return;
+                var d = parse(src[path]);
+                var changed = false;
+                d.querySelectorAll('footer [data-edit]').forEach(function (el) {
+                    var k = el.getAttribute('data-edit');
+                    if (k in footer && textOf(el) !== footer[k]) { el.textContent = footer[k]; changed = true; }
+                });
+                if (changed) store(path, serialize(d));
+            });
+            frameDirty = false;
+        }
+
+        function setMeta(doc, attr, name, value) {
+            var m = doc.querySelector('meta[' + attr + '="' + name + '"]');
+            if (m) m.setAttribute('content', value);
+        }
+
+        // ---- contact details (string replacement across all pages + scripts.js)
+
+        var contact = null;
+
+        function detectContact() {
+            var html = src['index.html'] || '';
+            var tel = (html.match(/href="tel:\+?(\d+)"/) || [])[1] || '';
+            var phoneText = (html.match(/href="tel:[^"]*"[^>]*>([^<]+)</) || [])[1] || '';
+            var wa = (html.match(/wa\.me\/(\d+)/) || [])[1] || '';
+            var email = (html.match(/href="mailto:([^"]+)"/) || [])[1] || '';
+            var insta = (html.match(/href="(https:\/\/(?:www\.)?instagram\.com\/[^"]*)"/) || [])[1] || '';
+            var yt = (html.match(/href="(https:\/\/(?:www\.)?youtube\.com\/[^"]*)"/) || [])[1] || '';
+            return { tel: tel, phoneText: phoneText, wa: wa, email: email, insta: insta, yt: yt };
+        }
+
+        function openContact() {
+            load().then(function () {
+                apply();
+                contact = detectContact();
+                $('#c-phone').value = contact.phoneText;
+                $('#c-wa').value = contact.wa ? '+' + contact.wa : '';
+                $('#c-email').value = contact.email;
+                $('#c-insta').value = contact.insta;
+                $('#c-yt').value = contact.yt;
+            });
+        }
+
+        function replaceAll(text, from, to) {
+            if (!from || from === to) return text;
+            return text.split(from).join(to);
+        }
+
+        $('#form-contact').addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!contact) return;
+            var phoneText = $('#c-phone').value.trim();
+            var tel = phoneText.replace(/\D/g, '');
+            var wa = $('#c-wa').value.replace(/\D/g, '');
+            var email = $('#c-email').value.trim();
+            var insta = $('#c-insta').value.trim();
+            var yt = $('#c-yt').value.trim();
+            if (tel.length < 10 || wa.length < 10) return toast('Please enter full phone numbers with the country code, e.g. +91 6360250855.', 'error');
+            if (!/^\S+@\S+\.\S+$/.test(email)) return toast('Please enter a valid email address.', 'error');
+            apply();
+            var files = PAGES.map(function (p) { return p[0]; }).concat(EXTRA_FILES);
+            var changed = 0;
+            files.forEach(function (path) {
+                if (!src[path]) return;
+                var t = src[path];
+                t = replaceAll(t, 'tel:+' + contact.tel, 'tel:+' + tel);
+                t = replaceAll(t, 'tel:' + contact.tel, 'tel:+' + tel);
+                t = replaceAll(t, contact.phoneText, phoneText);
+                t = replaceAll(t, 'wa.me/' + contact.wa, 'wa.me/' + wa);
+                t = replaceAll(t, contact.email, email);
+                if (insta) t = replaceAll(t, contact.insta, insta);
+                if (yt) t = replaceAll(t, contact.yt, yt);
+                if (t !== src[path]) { store(path, t); changed++; }
+            });
+            contact = detectContact();
+            if (current) { var keep = current; current = null; showPage(keep); }
+            toast(changed ? 'Contact details updated on ' + changed + ' files. Press Publish to put them live.' : 'Nothing changed.', changed ? 'ok' : 'info');
+        });
+
+        return { open: open, apply: apply, reset: reset, openContact: openContact };
+    })();
+
     // ---------------------------------------------------------------- publish
 
     function cleanItems() {
@@ -891,6 +1286,9 @@
         var tree = [{ path: GALLERY_PATH, mode: '100644', type: 'blob', content: json }];
         Object.keys(pendingBlobs).forEach(function (path) {
             tree.push({ path: path, mode: '100644', type: 'blob', sha: pendingBlobs[path] });
+        });
+        Object.keys(pendingFiles).forEach(function (path) {
+            tree.push({ path: path, mode: '100644', type: 'blob', content: pendingFiles[path] });
         });
         var deletes = Object.keys(pendingDeletes);
         // Only delete files that still exist on the branch (someone else may have removed them already).
@@ -914,7 +1312,7 @@
         }).then(function (tree) {
             return gh(repoPath() + '/git/commits', {
                 method: 'POST',
-                body: { message: 'Update gallery from admin page', tree: tree.sha, parents: [headSha] }
+                body: { message: Object.keys(pendingFiles).length ? 'Update website from admin page' : 'Update gallery from admin page', tree: tree.sha, parents: [headSha] }
             });
         }).then(function (commit) {
             return gh(repoPath() + '/git/refs/heads/' + encodeURIComponent(config.branch), {
@@ -925,9 +1323,20 @@
 
     $('#btn-publish').addEventListener('click', function () {
         var btn = $('#btn-publish');
+        Pages.apply();
         btn.disabled = true;
         $('#publish-status').innerHTML = '<strong>Publishing...</strong>';
         getHead().then(function (head) {
+            if (head === baseCommit) return commitOnto(head);
+            var edited = Object.keys(pendingFiles);
+            if (!edited.length) return head;
+            // Page edits replace whole files, so make sure nobody changed those files in the meantime.
+            return gh(repoPath() + '/compare/' + baseCommit + '...' + head).then(function (cmp) {
+                var clash = (cmp.files || []).some(function (f) { return edited.indexOf(f.filename) !== -1; });
+                if (clash) throw new Error('The website pages were updated by someone else while you were editing. Copy your text somewhere, reload this page, and make your page edits again.');
+                return head;
+            });
+        }).then(function (head) {
             if (head === baseCommit) return commitOnto(head);
             // The branch moved since this page loaded (e.g. your friend published, or a code update).
             return readRepoFile(GALLERY_PATH, baseCommit).then(function (mine) {
@@ -944,6 +1353,7 @@
             baseCommit = newSha;
             pendingBlobs = {};
             pendingDeletes = {};
+            pendingFiles = {};
             dirty = false;
             updatePublishBar();
             toast('Published! The website will show the changes in about 1 minute.', 'ok');

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Gallery Admin - Sons of Cauvery</title>
+    <title>Website Admin - Sons of Cauvery</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <style>
         :root {
@@ -168,6 +168,23 @@
         .drop-hint { border: 2px dashed var(--secondary); border-radius: var(--radius); padding: 18px; text-align: center; color: #557; margin-bottom: 16px; }
         .drop-hint.over { background: #eef6f5; }
 
+        /* Tabs */
+        .tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; }
+        .tab { border: 0; background: #e3ebe9; color: var(--dark); padding: 10px 16px; border-radius: 6px; font: inherit; font-weight: 600; cursor: pointer; white-space: nowrap; }
+        .tab.active { background: var(--primary); color: #fff; }
+        .page-bar { justify-content: space-between; }
+        .page-bar select, textarea { padding: 10px 12px; border: 1px solid #ccd5d3; border-radius: 6px; font: inherit; font-size: 1rem; }
+        .page-bar select { flex: 1 1 220px; max-width: 360px; }
+        textarea { width: 100%; resize: vertical; }
+        .seg { display: inline-flex; border: 2px solid var(--primary); border-radius: 6px; overflow: hidden; }
+        .seg-btn { border: 0; background: #fff; color: var(--primary); padding: 8px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+        .seg-btn.active { background: var(--primary); color: #fff; }
+        .meta-box { margin-top: 14px; }
+        .frame-wrap { background: #cfd8d6; border-radius: var(--radius); padding: 10px; margin-bottom: 20px; display: flex; justify-content: center; }
+        .frame-wrap iframe { width: 100%; height: 78vh; border: 0; background: #fff; border-radius: 4px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); transition: width 0.2s; }
+        .frame-wrap.phone iframe { width: 390px; max-width: 100%; }
+        .narrow-card { max-width: 620px; }
+
         @media (max-width: 600px) {
             .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .tile input { font-size: 0.85rem; }
@@ -180,7 +197,7 @@
 </head>
 <body>
     <header>
-        <h1>Sons of Cauvery <span>Gallery Admin</span></h1>
+        <h1>Sons of Cauvery <span>Website Admin</span></h1>
         <div class="links">
             <a href="gallery.html" target="_blank" rel="noopener">View site</a>
             <button id="btn-settings" class="hidden">Settings</button>
@@ -255,6 +272,13 @@
 
         <!-- Editor -->
         <section id="view-editor" class="hidden">
+            <nav class="tabs" role="tablist">
+                <button type="button" class="tab active" data-tab="gallery">Photos &amp; videos</button>
+                <button type="button" class="tab" data-tab="pages">Edit pages</button>
+                <button type="button" class="tab" data-tab="contact">Contact details</button>
+            </nav>
+
+            <div id="tab-gallery">
             <div class="card">
                 <h2>Banner slideshow</h2>
                 <p class="hint">These photos rotate at the top of every page. Drag to change the order. Add photos with the <svg class="icon"><use href="icons.svg#star"></use></svg> button below.</p>
@@ -279,6 +303,55 @@
                 <div class="drop-hint" id="drop-zone">Or drop photos and videos here</div>
                 <p class="hint" style="margin-bottom:12px">Photos and videos of any size are compressed automatically before uploading (keep this page open while a video compresses). Videos up to about 6 minutes can be added here; for longer ones, upload to YouTube and use "Add YouTube video".</p>
                 <div class="grid" id="grid"></div>
+            </div>
+            </div>
+
+            <div id="tab-pages" class="hidden">
+                <div class="card">
+                    <h2>Edit pages</h2>
+                    <p class="hint">Pick a page, then click any text with a yellow dotted outline to change it. Click the home page photo to replace it. Testimonials, "What We Offer" cards and terms sections have <b>Copy</b> and <b>Remove</b> buttons. Changes to the footer apply to every page. Press <b>Publish changes</b> when you're done.</p>
+                    <div class="row page-bar">
+                        <select id="page-select" aria-label="Page to edit"></select>
+                        <div class="seg" role="group" aria-label="Preview size">
+                            <button type="button" class="seg-btn active" data-view="desktop">Computer</button>
+                            <button type="button" class="seg-btn" data-view="phone">Phone</button>
+                        </div>
+                    </div>
+                    <details class="meta-box">
+                        <summary>Page title &amp; Google description</summary>
+                        <label for="meta-title">Title (shown in the browser tab, Google and WhatsApp previews)</label>
+                        <input type="text" id="meta-title" maxlength="80">
+                        <label for="meta-desc">Description (shown under the title on Google and in WhatsApp previews)</label>
+                        <textarea id="meta-desc" rows="3" maxlength="300"></textarea>
+                    </details>
+                </div>
+                <div class="frame-wrap" id="frame-wrap">
+                    <iframe id="page-frame" title="Page editor"></iframe>
+                </div>
+                <input type="file" id="img-input" accept="image/*" hidden>
+            </div>
+
+            <div id="tab-contact" class="hidden">
+                <div class="card narrow-card">
+                    <h2>Contact details</h2>
+                    <p class="hint">These are used everywhere on the site: footer, contact page, phone links, the WhatsApp button and the booking form.</p>
+                    <form id="form-contact">
+                        <label for="c-phone">Phone number (as people should see it)</label>
+                        <input type="text" id="c-phone" placeholder="+91 6360250855" required>
+                        <label for="c-wa">WhatsApp number (with country code)</label>
+                        <input type="text" id="c-wa" placeholder="+91 6360250855" required>
+                        <label for="c-email">Email</label>
+                        <input type="text" id="c-email" required>
+                        <label for="c-insta">Instagram link</label>
+                        <input type="url" id="c-insta">
+                        <label for="c-yt">YouTube link</label>
+                        <input type="url" id="c-yt">
+                        <div class="row" style="margin-top:16px">
+                            <button class="btn" type="submit">Apply to all pages</button>
+                        </div>
+                        <p class="hint" style="margin-top:10px">The address and opening hours can be changed in <b>Edit pages</b> (footer or contact page).</p>
+                    </form>
+                </div>
             </div>
         </section>
     </main>
